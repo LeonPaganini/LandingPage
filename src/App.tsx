@@ -75,26 +75,69 @@ const Hero: React.FC = () => (
   </section>
 );
 
-const Diagnostic: React.FC = () => (
-  <SectionWave className="bg-gradient-to-br from-softBeige via-rosyBeige/30 to-softBeige">
-    <div className="mx-auto max-w-5xl px-6">
-      <SectionTitle label={diagnostic.title} />
-      <GlassCard className="p-6 md:p-8">
-        <div className="grid gap-4 sm:grid-cols-2">
-          {diagnostic.symptoms.map((item) => (
-            <div key={item} className="flex items-start gap-3 text-deepText">
-              <span className="icon-circle text-lg">✓</span>
-              <p className="card-text text-base">{item}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 border-t border-white/60 pt-4 text-center text-sm font-semibold text-deepText">
-          {diagnostic.tagline}
-        </div>
-      </GlassCard>
-    </div>
-  </SectionWave>
-);
+const Diagnostic: React.FC = () => {
+  const [selected, setSelected] = React.useState<Set<string>>(new Set());
+
+  const toggleSymptom = (item: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(item)) {
+        next.delete(item);
+      } else {
+        next.add(item);
+      }
+      return next;
+    });
+  };
+
+  const selectedCount = selected.size;
+  const totalSymptoms = diagnostic.symptoms.length;
+
+  return (
+    <SectionWave className="bg-gradient-to-br from-softBeige via-rosyBeige/30 to-softBeige">
+      <div className="mx-auto max-w-6xl px-6">
+        <SectionTitle label={diagnostic.title} />
+        <GlassCard className="p-6 md:p-8">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {diagnostic.symptoms.map((item) => {
+              const isSelected = selected.has(item);
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => toggleSymptom(item)}
+                  className={`group flex items-start gap-3 rounded-2xl p-3 text-left transition focus:outline-none focus:ring-2 focus:ring-roseGlow/60 ${
+                    isSelected ? "bg-white/80 shadow-lg" : "hover:bg-white/60"
+                  }`}
+                >
+                  <span
+                    className={`icon-circle text-lg transition-colors ${
+                      isSelected ? "bg-deepText text-white" : ""
+                    }`}
+                  >
+                    ✓
+                  </span>
+                  <p
+                    className={`card-text text-base transition-colors ${
+                      isSelected ? "font-semibold text-deepText" : ""
+                    }`}
+                  >
+                    {item}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-6 border-t border-white/60 pt-4 text-center text-sm font-semibold text-deepText">
+            {selectedCount > 0
+              ? `${selectedCount}/${totalSymptoms} Motivos para você agendar sua Consulta`
+              : diagnostic.tagline}
+          </div>
+        </GlassCard>
+      </div>
+    </SectionWave>
+  );
+};
 
 const About: React.FC = () => (
   <SectionWave className="bg-white/70">
