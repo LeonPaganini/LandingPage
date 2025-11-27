@@ -1,12 +1,20 @@
 export const palette = {
-  primaryRose: "#FF8DA1",
-  peach: "#FFD4B8",
-  softBeige: "#FBEEDD",
-  rosyBeige: "#F4A9A3",
-  cta: "#E05780",
-  icon: "#D17B8F",
-  text: "#1E1E1E",
-  muted: "#4A4A4A",
+  primary900: "#1F4D3A",
+  primary700: "#2E6A50",
+  primary500: "#3E8C67",
+  primary300: "#66B08E",
+  olive900: "#3E4C35",
+  olive700: "#556247",
+  peach500: "#F4CBB4",
+  blush300: "#F0D9D3",
+  neutral900: "#1F2622",
+  neutral600: "#4A554F",
+  neutral400: "#8A938D",
+  surface100: "#F6F4F2",
+  surface200: "#EFEAE6",
+  success: "#2E8B57",
+  warning: "#C9A441",
+  error: "#C45B5B",
 };
 
 export const hero = {
