@@ -12,7 +12,7 @@ import {
 } from "./data/content";
 
 const SectionTitle: React.FC<{ label: string }> = ({ label }) => (
-  <h2 className="section-title text-deepText">{label}</h2>
+  <h2 className="section-title text-neutral-900">{label}</h2>
 );
 
 const GlassCard: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
@@ -36,7 +36,7 @@ const SectionWave: React.FC<React.PropsWithChildren<{ className?: string }>> = (
 );
 
 const Hero: React.FC = () => (
-  <section className="relative overflow-hidden bg-gradient-to-br from-roseGlow/70 via-peachGlow/70 to-softBeige/80 text-deepText">
+  <section className="relative overflow-hidden bg-gradient-to-br from-primary-700/75 via-peach-500/70 to-surface-200/80 text-neutral-900">
     <div
       className="absolute inset-0"
       style={{
@@ -94,7 +94,7 @@ const Diagnostic: React.FC = () => {
   const totalSymptoms = diagnostic.symptoms.length;
 
   return (
-    <SectionWave className="bg-gradient-to-br from-softBeige via-rosyBeige/30 to-softBeige">
+    <SectionWave className="bg-gradient-to-br from-surface-100 via-blush-300/30 to-surface-100">
       <div className="mx-auto max-w-6xl px-6">
         <SectionTitle label={diagnostic.title} />
         <GlassCard className="p-6 md:p-8">
@@ -106,20 +106,20 @@ const Diagnostic: React.FC = () => {
                   key={item}
                   type="button"
                   onClick={() => toggleSymptom(item)}
-                  className={`group flex items-start gap-3 rounded-2xl p-3 text-left transition focus:outline-none focus:ring-2 focus:ring-roseGlow/60 ${
+                  className={`group flex items-start gap-3 rounded-2xl p-3 text-left transition focus:outline-none focus:ring-2 focus:ring-primary-700/60 ${
                     isSelected ? "bg-white/80 shadow-lg" : "hover:bg-white/60"
                   }`}
                 >
                   <span
                     className={`icon-circle text-lg transition-colors ${
-                      isSelected ? "bg-deepText text-white" : ""
+                      isSelected ? "bg-neutral-900 text-white" : ""
                     }`}
                   >
                     ✓
                   </span>
                   <p
                     className={`card-text text-base transition-colors ${
-                      isSelected ? "font-semibold text-deepText" : ""
+                      isSelected ? "font-semibold text-neutral-900" : ""
                     }`}
                   >
                     {item}
@@ -128,7 +128,7 @@ const Diagnostic: React.FC = () => {
               );
             })}
           </div>
-          <div className="mt-6 border-t border-white/60 pt-4 text-center text-sm font-semibold text-deepText">
+          <div className="mt-6 border-t border-white/60 pt-4 text-center text-sm font-semibold text-neutral-900">
             {selectedCount > 0
               ? `${selectedCount}/${totalSymptoms} Motivos para você agendar sua Consulta`
               : diagnostic.tagline}
@@ -156,17 +156,17 @@ const About: React.FC = () => (
         </GlassCard>
         <GlassCard className="p-6 md:p-8">
           <p className="card-text text-base">{about.text}</p>
-          <ul className="mt-4 space-y-3 text-sm font-semibold text-deepText">
+          <ul className="mt-4 space-y-3 text-sm font-semibold text-neutral-900">
             {about.bullets.map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <span className="mt-1 text-icon">•</span>
+                <span className="mt-1 text-primary-700">•</span>
                 <span>{item}</span>
               </li>
             ))}
           </ul>
           <div className="mt-6 flex flex-wrap gap-3">
             <CTAButton label="Quero orientação leve" />
-            <button className="rounded-full border border-deepText/10 px-5 py-3 text-sm font-semibold text-deepText transition hover:-translate-y-0.5 hover:bg-peachGlow/40">
+            <button className="rounded-full border border-neutral-900/10 px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40">
               Falar com a Thaís
             </button>
           </div>
@@ -177,7 +177,7 @@ const About: React.FC = () => (
 );
 
 const Methods: React.FC = () => (
-  <SectionWave className="bg-gradient-to-b from-peachGlow/40 via-softBeige to-white">
+  <SectionWave className="bg-gradient-to-b from-peach-500/40 via-surface-100 to-white">
     <div className="mx-auto max-w-6xl px-6">
       <SectionTitle label="Métodos & Programas" />
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -189,10 +189,10 @@ const Methods: React.FC = () => (
                 <span className="badge-pill bg-white/60 text-[11px]">Glass</span>
               </div>
               <p className="card-text">{program.desc}</p>
-              <ul className="space-y-2 text-sm text-deepText">
+              <ul className="space-y-2 text-sm text-neutral-900">
                 {program.bullets.map((bullet) => (
                   <li key={bullet} className="flex items-center gap-2">
-                    <span className="text-icon">✓</span>
+                    <span className="text-primary-700">✓</span>
                     <span>{bullet}</span>
                   </li>
                 ))}
@@ -209,19 +209,19 @@ const Methods: React.FC = () => (
 );
 
 const Story: React.FC = () => (
-  <SectionWave className="bg-rosyBeige/20">
+  <SectionWave className="bg-blush-300/20">
     <div className="mx-auto max-w-5xl px-6">
       <GlassCard className="p-6 md:p-10 text-center">
         <SectionTitle label={story.title} />
-        <p className="text-xl font-semibold text-deepText md:text-2xl">{story.headline}</p>
+        <p className="text-xl font-semibold text-neutral-900 md:text-2xl">{story.headline}</p>
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           {story.bullets.map((item) => (
-            <div key={item} className="glass-card p-4 text-sm font-semibold text-deepText">
+            <div key={item} className="glass-card p-4 text-sm font-semibold text-neutral-900">
               {item}
             </div>
           ))}
         </div>
-        <p className="mt-6 text-base text-mutedText">{story.text}</p>
+        <p className="mt-6 text-base text-neutral-600">{story.text}</p>
         <div className="mt-8 flex justify-center">
           <CTAButton label="Quero viver isso" />
         </div>
@@ -231,7 +231,7 @@ const Story: React.FC = () => (
 );
 
 const Benefits: React.FC = () => (
-  <SectionWave className="bg-gradient-to-tr from-softBeige via-peachGlow/30 to-rosyBeige/20">
+  <SectionWave className="bg-gradient-to-tr from-surface-100 via-peach-500/30 to-blush-300/20">
     <div className="mx-auto max-w-6xl px-6">
       <SectionTitle label="Benefícios práticos" />
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -258,9 +258,9 @@ const Testimonials: React.FC = () => (
       <div className="flex gap-4 overflow-x-auto pb-4">
         {testimonials.map((item) => (
           <GlassCard key={item.name} className="min-w-[260px] max-w-sm flex-1 p-5">
-            <p className="text-sm italic text-deepText">“{item.text}”</p>
-            <div className="mt-3 text-sm font-semibold text-mutedText">{item.name}</div>
-            <div className="mt-2 inline-flex rounded-full bg-softBeige/60 px-3 py-1 text-xs font-semibold text-deepText">
+            <p className="text-sm italic text-neutral-900">“{item.text}”</p>
+            <div className="mt-3 text-sm font-semibold text-neutral-600">{item.name}</div>
+            <div className="mt-2 inline-flex rounded-full bg-surface-100/60 px-3 py-1 text-xs font-semibold text-neutral-900">
               {item.tag}
             </div>
           </GlassCard>
@@ -271,7 +271,7 @@ const Testimonials: React.FC = () => (
 );
 
 const FAQ: React.FC = () => (
-  <SectionWave className="bg-gradient-to-b from-rosyBeige/30 via-softBeige to-white">
+  <SectionWave className="bg-gradient-to-b from-blush-300/30 via-surface-100 to-white">
     <div className="mx-auto max-w-5xl px-6">
       <SectionTitle label="Perguntas frequentes" />
       <div className="grid gap-4 md:grid-cols-2">
@@ -287,7 +287,7 @@ const FAQ: React.FC = () => (
 );
 
 const FinalCTA: React.FC = () => (
-  <section className="relative overflow-hidden bg-gradient-to-br from-roseGlow/70 via-peachGlow/60 to-rosyBeige/60 text-white">
+  <section className="relative overflow-hidden bg-gradient-to-br from-primary-700/70 via-peach-500/60 to-blush-300/60 text-white">
     <div
       className="absolute inset-0"
       style={{
@@ -313,22 +313,22 @@ const FinalCTA: React.FC = () => (
 );
 
 const Footer: React.FC = () => (
-  <footer className="bg-softBeige/90 py-6 text-center text-xs text-deepText">
+  <footer className="bg-surface-100/90 py-6 text-center text-xs text-neutral-900">
     <div className="flex flex-col items-center gap-2">
-      <div className="flex gap-3 text-icon">
+      <div className="flex gap-3 text-primary-700">
         <span className="icon-circle">IG</span>
         <span className="icon-circle">TT</span>
         <span className="icon-circle">WA</span>
       </div>
       <p>© 2024 Thaís Paganini | Nutrição Feminina</p>
-      <p className="text-mutedText">{footer.note}</p>
+      <p className="text-neutral-600">{footer.note}</p>
     </div>
   </footer>
 );
 
 const App: React.FC = () => {
   return (
-    <main className="min-h-screen bg-softBeige text-deepText">
+    <main className="min-h-screen bg-surface-100 text-neutral-900">
       <header className="sticky top-0 z-20 bg-white/70 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 text-sm font-semibold">
           <span>Thaís Paganini | Nutrição Feminina</span>

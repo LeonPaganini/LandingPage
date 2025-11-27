@@ -4,20 +4,53 @@
 
 :root {
   color-scheme: light;
+  --primary-900: #1f4d3a;
+  --primary-700: #2e6a50;
+  --primary-500: #3e8c67;
+  --primary-300: #66b08e;
+  --olive-900: #3e4c35;
+  --olive-700: #556247;
+  --peach-500: #f4cbb4;
+  --blush-300: #f0d9d3;
+  --success: #2e8b57;
+  --warning: #c9a441;
+  --error: #c45b5b;
+  --text-dark: #1f2622;
+  --text-medium: #4a554f;
+  --text-soft: #8a938d;
+  --bg-soft-1: #f6f4f2;
+  --bg-soft-2: #efeae6;
+
+  /* RGBA tokens */
+  --primary-500-rgba: 62, 140, 103;
+  --olive-700-rgba: 85, 98, 71;
+  --peach-500-rgba: 244, 203, 180;
+  --blush-300-rgba: 240, 217, 211;
+
+  /* Gradients */
+  --grad-wellness: linear-gradient(135deg, #2e6a50 0%, #f4cbb4 100%);
+  --grad-olive-blush: linear-gradient(135deg, #556247 0%, #f0d9d3 100%);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.54);
+  --glass-border: rgba(62, 106, 80, 0.35);
+  --glass-shadow: 0 10px 35px rgba(31, 77, 58, 0.25);
 }
 
 body {
-  background: radial-gradient(circle at 10% 20%, rgba(255, 181, 194, 0.25), transparent 25%),
-    radial-gradient(circle at 90% 10%, rgba(244, 169, 163, 0.18), transparent 20%),
-    radial-gradient(circle at 50% 90%, rgba(255, 212, 184, 0.22), transparent 22%),
-    #fbeedd;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(var(--peach-500-rgba), 0.2), transparent 25%),
+    radial-gradient(circle at 90% 10%, rgba(var(--blush-300-rgba), 0.2), transparent 20%),
+    radial-gradient(circle at 50% 90%, rgba(var(--primary-500-rgba), 0.12), transparent 22%),
+    var(--bg-soft-1);
+  color: var(--text-dark);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--glass-shadow);
   backdrop-filter: blur(20px);
 }
 
@@ -32,14 +65,14 @@ body {
   right: 0;
   bottom: -1px;
   height: 48px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffd4b8' fill-opacity='0.45' d='M0,288L80,272C160,256,320,224,480,192C640,160,800,128,960,117.3C1120,107,1280,117,1360,122.7L1440,128L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z'%3E%3C/path%3E%3C/svg%3E")
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23f4cbb4' fill-opacity='0.45' d='M0,288L80,272C160,256,320,224,480,192C640,160,800,128,960,117.3C1120,107,1280,117,1360,122.7L1440,128L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z'%3E%3C/path%3E%3C/svg%3E")
     center/cover no-repeat;
   pointer-events: none;
 }
 
 .button-primary {
   @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition-transform duration-200 ease-out shadow-lg;
-  background: linear-gradient(135deg, #ff8da1, #ffd4b8);
+  background: var(--grad-wellness);
 }
 
 .button-primary:hover {
@@ -47,15 +80,15 @@ body {
 }
 
 .badge-pill {
-  @apply inline-flex items-center gap-2 rounded-full bg-white/50 px-3 py-1 text-xs font-semibold text-deepText shadow-sm;
+  @apply inline-flex items-center gap-2 rounded-full bg-white/50 px-3 py-1 text-xs font-semibold text-neutral-900 shadow-sm;
 }
 
 .card-title {
-  @apply text-lg font-semibold text-deepText;
+  @apply text-lg font-semibold text-neutral-900;
 }
 
 .card-text {
-  @apply text-sm text-mutedText leading-relaxed;
+  @apply text-sm text-neutral-600 leading-relaxed;
 }
 
 .section-title {
@@ -63,5 +96,5 @@ body {
 }
 
 .icon-circle {
-  @apply flex h-12 w-12 items-center justify-center rounded-full bg-white/60 text-icon shadow-inner;
+  @apply flex h-12 w-12 items-center justify-center rounded-full bg-white/70 text-primary-700 shadow-inner;
 }
