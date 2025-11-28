@@ -10,6 +10,7 @@ import {
   story,
   testimonials,
 } from "./data/content";
+import BodyFatCalculator from "./Calculator";
 
 const SectionTitle: React.FC<{ label: string }> = ({ label }) => (
   <h2 className="section-title text-neutral-900">{label}</h2>
@@ -24,9 +25,32 @@ const Badge: React.FC<React.PropsWithChildren> = ({ children }) => (
   <span className="badge-pill">{children}</span>
 );
 
-const CTAButton: React.FC<{ label: string }> = ({ label }) => (
-  <button className="button-primary">{label}</button>
-);
+const CTAButton: React.FC<{ label: string; href?: string; onClick?: () => void }> = ({
+  label,
+  href,
+  onClick,
+}) => {
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+    if (onClick) {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
+  if (href) {
+    return (
+      <a className="button-primary" href={href} onClick={handleClick}>
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <button type="button" className="button-primary" onClick={onClick}>
+      {label}
+    </button>
+  );
+};
 
 const SectionWave: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
   children,
@@ -176,33 +200,40 @@ const About: React.FC = () => (
   </SectionWave>
 );
 
-const Methods: React.FC = () => (
+const Methods: React.FC<{ onNavigateToCalculator: () => void }> = ({ onNavigateToCalculator }) => (
   <SectionWave className="bg-gradient-to-b from-peach-500/40 via-surface-100 to-white">
     <div className="mx-auto max-w-6xl px-6">
       <SectionTitle label="Métodos & Programas" />
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {programs.map((program) => (
-          <GlassCard key={program.title} className="p-6 transition hover:-translate-y-1">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <p className="card-title">{program.title}</p>
-                <span className="badge-pill bg-white/60 text-[11px]">Glass</span>
+        {programs.map((program) => {
+          const goToCalculator = program.cta.toLowerCase().includes("calcular");
+          return (
+            <GlassCard key={program.title} className="p-6 transition hover:-translate-y-1">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <p className="card-title">{program.title}</p>
+                  <span className="badge-pill bg-white/60 text-[11px]">Glass</span>
+                </div>
+                <p className="card-text">{program.desc}</p>
+                <ul className="space-y-2 text-sm text-neutral-900">
+                  {program.bullets.map((bullet) => (
+                    <li key={bullet} className="flex items-center gap-2">
+                      <span className="text-primary-700">✓</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="pt-2">
+                  <CTAButton
+                    label={program.cta}
+                    href={goToCalculator ? "?page=calculadora_gordura" : undefined}
+                    onClick={goToCalculator ? onNavigateToCalculator : undefined}
+                  />
+                </div>
               </div>
-              <p className="card-text">{program.desc}</p>
-              <ul className="space-y-2 text-sm text-neutral-900">
-                {program.bullets.map((bullet) => (
-                  <li key={bullet} className="flex items-center gap-2">
-                    <span className="text-primary-700">✓</span>
-                    <span>{bullet}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="pt-2">
-                <CTAButton label={program.cta} />
-              </div>
-            </div>
-          </GlassCard>
-        ))}
+            </GlassCard>
+          );
+        })}
       </div>
     </div>
   </SectionWave>
@@ -326,24 +357,72 @@ const Footer: React.FC = () => (
   </footer>
 );
 
+const LandingContent: React.FC<{ onNavigateToCalculator: () => void }> = ({ onNavigateToCalculator }) => (
+  <>
+    <Hero />
+    <Diagnostic />
+    <About />
+    <Methods onNavigateToCalculator={onNavigateToCalculator} />
+    <Story />
+    <Benefits />
+    <Testimonials />
+    <FAQ />
+    <FinalCTA />
+  </>
+);
+
 const App: React.FC = () => {
+  const getIsCalculator = React.useCallback(() => {
+    return new URLSearchParams(window.location.search).get("page") === "calculadora_gordura";
+  }, []);
+
+  const [isCalculator, setIsCalculator] = React.useState<boolean>(getIsCalculator);
+
+  React.useEffect(() => {
+    const handlePopState = () => setIsCalculator(getIsCalculator());
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [getIsCalculator]);
+
+  const navigateToCalculator = React.useCallback(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("page", "calculadora_gordura");
+    window.history.pushState({}, "", url);
+    setIsCalculator(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const navigateHome = React.useCallback(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("page");
+    const normalized = `${url.pathname}${url.search}${url.hash}`;
+    window.history.pushState({}, "", normalized);
+    setIsCalculator(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   return (
     <main className="min-h-screen bg-surface-100 text-neutral-900">
       <header className="sticky top-0 z-20 bg-white/70 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 text-sm font-semibold">
-          <span>Thaís Paganini | Nutrição Feminina</span>
-          <CTAButton label="Agendar consulta" />
+          <button
+            type="button"
+            onClick={navigateHome}
+            className="text-left font-semibold text-neutral-900 transition hover:text-primary-700"
+          >
+            Thaís Paganini | Nutrição Feminina
+          </button>
+          <div className="flex items-center gap-3">
+            <CTAButton label="Agendar consulta" />
+            <CTAButton label="Calcular agora" href="?page=calculadora_gordura" onClick={navigateToCalculator} />
+          </div>
         </div>
       </header>
-      <Hero />
-      <Diagnostic />
-      <About />
-      <Methods />
-      <Story />
-      <Benefits />
-      <Testimonials />
-      <FAQ />
-      <FinalCTA />
+      {isCalculator ? (
+        <BodyFatCalculator />
+      ) : (
+        <LandingContent onNavigateToCalculator={navigateToCalculator} />
+      )}
       <Footer />
     </main>
   );
