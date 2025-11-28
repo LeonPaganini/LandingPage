@@ -84,6 +84,12 @@ export const programs = [
     bullets: ["Resultado rápido", "Meta segura", "Orientação inicial"],
     cta: "Calcular agora",
   },
+  {
+    title: "Protolos focados em Análogos de LGP1",
+    desc: "Acompanhamento, protocolo de fitoterápicos e plano personalizado.",
+    bullets: ["Resultado rápido", "Meta segura", "Orientação inicial"],
+    cta: "Calcular agora",
+  },
 ];
 
 export const story = {
