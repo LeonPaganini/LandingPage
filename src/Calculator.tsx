@@ -1,4 +1,5 @@
 import React from "react";
+import { salvarLeadCalculadora } from "./leadService.js";
 
 const STORAGE_KEY = "bodyFatCalculatorState";
 
@@ -15,6 +16,11 @@ type Measurements = {
 type Result = {
   value: number;
   classification: string;
+};
+
+type LeadInfo = {
+  fullName: string;
+  phone: string;
 };
 
 type FieldConfig = {
@@ -81,7 +87,20 @@ const defaultMeasurements: Measurements = {
   abdomen: "",
 };
 
+const defaultLeadInfo: LeadInfo = {
+  fullName: "",
+  phone: "",
+};
+
 const cmToInches = (value: number) => value / 2.54;
+
+const normalizePhoneNumber = (value: string) => value.replace(/\D/g, "").slice(0, 11);
+
+const formatPhoneNumber = (digits: string) => {
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+};
 
 export const calculateBodyFat = (
   sex: Sex,
@@ -137,6 +156,7 @@ const loadCachedState = () => {
     return JSON.parse(raw) as {
       sex: Sex;
       measurements: Measurements;
+      leadInfo?: LeadInfo;
       result?: Result | null;
     };
   } catch (error) {
@@ -148,10 +168,39 @@ const loadCachedState = () => {
 const saveCachedState = (payload: {
   sex: Sex;
   measurements: Measurements;
+  leadInfo: LeadInfo;
   result?: Result | null;
 }) => {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+};
+
+const validateLeadInfo = (leadInfo: LeadInfo, touched: Set<keyof LeadInfo>) => {
+  const errors: Partial<Record<keyof LeadInfo, string>> = {};
+
+  const trimmedName = leadInfo.fullName.trim();
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/u;
+
+  if (touched.has("fullName")) {
+    if (!trimmedName) {
+      errors.fullName = "Informe um nome válido (mínimo 3 caracteres).";
+    } else if (trimmedName.length < 3) {
+      errors.fullName = "Informe um nome válido (mínimo 3 caracteres).";
+    } else if (trimmedName.length > 80) {
+      errors.fullName = "Nome deve ter no máximo 80 caracteres.";
+    } else if (!nameRegex.test(leadInfo.fullName)) {
+      errors.fullName = "Use apenas letras e espaços.";
+    }
+  }
+
+  if (touched.has("phone")) {
+    const digits = normalizePhoneNumber(leadInfo.phone);
+    if (!digits || digits.length !== 11) {
+      errors.phone = "Informe um celular válido com DDD (11 dígitos).";
+    }
+  }
+
+  return errors;
 };
 
 const validateMeasurements = (
@@ -276,26 +325,46 @@ const BodyFatCalculator: React.FC = () => {
   const [measurements, setMeasurements] = React.useState<Measurements>(
     cached?.measurements ?? defaultMeasurements
   );
+  const [leadInfo, setLeadInfo] = React.useState<LeadInfo>(cached?.leadInfo ?? defaultLeadInfo);
   const [touched, setTouched] = React.useState<Set<keyof Measurements>>(new Set());
+  const [leadTouched, setLeadTouched] = React.useState<Set<keyof LeadInfo>>(new Set());
   const [result, setResult] = React.useState<Result | null>(cached?.result ?? null);
   const [submitError, setSubmitError] = React.useState<string>("");
   const [isDownloading, setIsDownloading] = React.useState(false);
 
   React.useEffect(() => {
-    saveCachedState({ sex, measurements, result });
-  }, [measurements, result, sex]);
+    saveCachedState({ sex, measurements, leadInfo, result });
+  }, [leadInfo, measurements, result, sex]);
 
-  const errors = React.useMemo(() => validateMeasurements(sex, measurements, touched), [sex, measurements, touched]);
+  const measurementErrors = React.useMemo(
+    () => validateMeasurements(sex, measurements, touched),
+    [sex, measurements, touched]
+  );
+  const leadErrors = React.useMemo(() => validateLeadInfo(leadInfo, leadTouched), [leadInfo, leadTouched]);
 
   const handleFieldChange = (field: keyof Measurements, value: string) => {
     setMeasurements((prev) => ({ ...prev, [field]: value }));
     setTouched((prev) => new Set(prev).add(field));
   };
 
+  const handleLeadChange = (field: keyof LeadInfo, value: string) => {
+    if (field === "phone") {
+      const digits = normalizePhoneNumber(value);
+      setLeadInfo((prev) => ({ ...prev, phone: digits }));
+      setLeadTouched((prev) => new Set(prev).add(field));
+      return;
+    }
+
+    setLeadInfo((prev) => ({ ...prev, fullName: value }));
+    setLeadTouched((prev) => new Set(prev).add(field));
+  };
+
   const clearData = () => {
     setMeasurements(defaultMeasurements);
+    setLeadInfo(defaultLeadInfo);
     setResult(null);
     setTouched(new Set());
+    setLeadTouched(new Set());
     setSubmitError("");
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEY);
@@ -304,10 +373,19 @@ const BodyFatCalculator: React.FC = () => {
 
   const isFormValid = () => {
     const required = sex === "female" ? ["height", "waist", "hip", "neck"] : ["height", "abdomen", "neck"];
-    return required.every((field) => {
+    const measurementsAreValid = required.every((field) => {
       const value = measurements[field as keyof Measurements];
-      return value !== "" && !(errors as Record<string, string>)[field as string];
+      return value !== "" && !(measurementErrors as Record<string, string>)[field as string];
     });
+
+    const trimmedName = leadInfo.fullName.trim();
+    const nameValid =
+      trimmedName.length >= 3 &&
+      trimmedName.length <= 80 &&
+      !leadErrors.fullName;
+    const phoneValid = leadInfo.phone.length === 11 && !leadErrors.phone;
+
+    return measurementsAreValid && nameValid && phoneValid;
   };
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -316,13 +394,20 @@ const BodyFatCalculator: React.FC = () => {
     (sex === "female" ? femaleFields : maleFields).forEach((field) => nextTouched.add(field.id));
     setTouched(nextTouched);
 
+    const nextLeadTouched = new Set<keyof LeadInfo>(leadTouched);
+    (["fullName", "phone"] as (keyof LeadInfo)[]).forEach((field) => nextLeadTouched.add(field));
+    setLeadTouched(nextLeadTouched);
+
     const currentErrors = validateMeasurements(sex, measurements, nextTouched);
-    const hasErrors = Object.values(currentErrors).some(Boolean);
+    const currentLeadErrors = validateLeadInfo(leadInfo, nextLeadTouched);
+    const hasErrors =
+      Object.values(currentErrors).some(Boolean) || Object.values(currentLeadErrors).some(Boolean);
     if (hasErrors) {
       setSubmitError("Preencha os campos obrigatórios com valores realistas.");
       return;
     }
 
+    const trimmedName = leadInfo.fullName.trim();
     const height = Number(measurements.height);
     const neck = Number(measurements.neck);
     const waist = sex === "female" ? Number(measurements.waist) : undefined;
@@ -339,6 +424,20 @@ const BodyFatCalculator: React.FC = () => {
 
     setResult({ value, classification });
     setSubmitError("");
+
+    void salvarLeadCalculadora({
+      nome: trimmedName,
+      celular: leadInfo.phone,
+      genero: sex === "female" ? "feminino" : "masculino",
+      resultado_gordura: value,
+      dados_medidas: {
+        altura_cm: height,
+        pescoco_cm: neck,
+        cintura_cm: sex === "female" ? waist : undefined,
+        quadril_cm: sex === "female" ? hip : undefined,
+        abdomen_cm: sex === "male" ? abdomen : undefined,
+      },
+    });
   };
 
   const downloadInstagramPost = async () => {
@@ -459,7 +558,9 @@ const BodyFatCalculator: React.FC = () => {
               <button
                 type="button"
                 className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  sex === "female" ? "bg-primary-700 text-white shadow" : "text-neutral-800"
+                  sex === "female"
+                    ? "bg-rose-400 text-white shadow hover:bg-rose-500"
+                    : "text-neutral-800 hover:bg-white/70"
                 }`}
                 onClick={() => setSex("female")}
                 aria-pressed={sex === "female"}
@@ -469,7 +570,9 @@ const BodyFatCalculator: React.FC = () => {
               <button
                 type="button"
                 className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  sex === "male" ? "bg-primary-700 text-white shadow" : "text-neutral-800"
+                  sex === "male"
+                    ? "bg-primary-700 text-white shadow hover:bg-primary-900"
+                    : "text-neutral-800 hover:bg-white/70"
                 }`}
                 onClick={() => setSex("male")}
                 aria-pressed={sex === "male"}
@@ -481,6 +584,57 @@ const BodyFatCalculator: React.FC = () => {
 
           <form className="mt-8" onSubmit={handleSubmit}>
             <div className="grid gap-4 md:grid-cols-2">
+              <label className="flex flex-col gap-2 rounded-2xl bg-white/70 p-4 shadow">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-neutral-900">Nome completo</span>
+                  <span className="rounded-full bg-neutral-900/70 px-3 py-1 text-xs font-semibold text-white">Lead</span>
+                </div>
+                <input
+                  id="fullName"
+                  type="text"
+                  value={leadInfo.fullName}
+                  maxLength={80}
+                  onChange={(event) => handleLeadChange("fullName", event.target.value)}
+                  onBlur={() => setLeadTouched((prev) => new Set(prev).add("fullName"))}
+                  placeholder="Ex.: Ana Silva"
+                  className="w-full rounded-xl border border-white/40 bg-white/80 px-4 py-3 text-base font-semibold text-neutral-900 shadow-inner outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/40"
+                  aria-describedby="fullName-error"
+                  autoComplete="name"
+                />
+                {leadErrors.fullName && (
+                  <p id="fullName-error" className="text-xs font-semibold text-error">
+                    {leadErrors.fullName}
+                  </p>
+                )}
+              </label>
+
+              <label className="flex flex-col gap-2 rounded-2xl bg-white/70 p-4 shadow">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-neutral-900">Celular (WhatsApp)</span>
+                  <span className="rounded-full bg-neutral-900/70 px-3 py-1 text-xs font-semibold text-white">Contato</span>
+                </div>
+                <input
+                  id="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={formatPhoneNumber(leadInfo.phone)}
+                  onChange={(event) => handleLeadChange("phone", event.target.value)}
+                  onBlur={() => setLeadTouched((prev) => new Set(prev).add("phone"))}
+                  placeholder="(11) 98765-4321"
+                  className="w-full rounded-xl border border-white/40 bg-white/80 px-4 py-3 text-base font-semibold text-neutral-900 shadow-inner outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/40"
+                  aria-describedby="phone-error"
+                  autoComplete="tel-national"
+                />
+                {leadErrors.phone && (
+                  <p id="phone-error" className="text-xs font-semibold text-error">
+                    {leadErrors.phone}
+                  </p>
+                )}
+              </label>
+            </div>
+
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
               {visibleFields.map((field) => (
                 <label key={field.id} className="flex flex-col gap-2 rounded-2xl bg-white/70 p-4 shadow">
                   <div className="flex items-center justify-between gap-3">
@@ -505,9 +659,9 @@ const BodyFatCalculator: React.FC = () => {
                       {field.helper}
                     </p>
                   )}
-                  {errors[field.id] && (
+                  {measurementErrors[field.id] && (
                     <p id={`${field.id}-error`} className="text-xs font-semibold text-error">
-                      {errors[field.id]}
+                      {measurementErrors[field.id]}
                     </p>
                   )}
                 </label>
