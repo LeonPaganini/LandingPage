@@ -613,11 +613,11 @@ const BodyFatCalculator: React.FC = () => {
                   <span className="text-sm font-semibold text-neutral-900">Celular (WhatsApp)</span>
                   <span className="rounded-full bg-neutral-900/70 px-3 py-1 text-xs font-semibold text-white">Contato</span>
                 </div>
+              
                 <input
                   id="phone"
                   type="tel"
                   inputMode="numeric"
-                  pattern="[0-9]*"
                   value={formatPhoneNumber(leadInfo.phone)}
                   onChange={(event) => handleLeadChange("phone", event.target.value)}
                   onBlur={() => setLeadTouched((prev) => new Set(prev).add("phone"))}
@@ -626,6 +626,7 @@ const BodyFatCalculator: React.FC = () => {
                   aria-describedby="phone-error"
                   autoComplete="tel-national"
                 />
+              
                 {leadErrors.phone && (
                   <p id="phone-error" className="text-xs font-semibold text-error">
                     {leadErrors.phone}
