@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist-tests",
+    "types": ["vite/client"]
+  },
+  "include": ["src", "tests"]
+}

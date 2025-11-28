@@ -81,6 +81,42 @@ const defaultMeasurements: Measurements = {
   abdomen: "",
 };
 
+const cmToInches = (value: number) => value / 2.54;
+
+export const calculateBodyFat = (
+  sex: Sex,
+  {
+    height,
+    waist,
+    hip,
+    neck,
+    abdomen,
+  }: { height: number; waist?: number; hip?: number; neck: number; abdomen?: number }
+) => {
+  const heightIn = cmToInches(height);
+  const neckIn = cmToInches(neck);
+
+  if (Number.isNaN(height) || Number.isNaN(neck)) return null;
+
+  if (heightIn <= 0) return null;
+
+  if (sex === "female") {
+    if (waist === undefined || hip === undefined) return null;
+    if (Number.isNaN(waist) || Number.isNaN(hip)) return null;
+    const circumferenceTerm = cmToInches(waist) + cmToInches(hip) - neckIn;
+    if (circumferenceTerm <= 0) return null;
+
+    return 163.205 * Math.log10(circumferenceTerm) - 97.684 * Math.log10(heightIn) - 78.387;
+  }
+
+  if (abdomen === undefined) return null;
+  if (Number.isNaN(abdomen)) return null;
+  const circumferenceTerm = cmToInches(abdomen) + cmToInches(abdomen) - neckIn;
+  if (circumferenceTerm <= 0) return null;
+
+  return 163.205 * Math.log10(circumferenceTerm) - 97.684 * Math.log10(heightIn) - 78.387;
+};
+
 const classifyBodyFat = (sex: Sex, value: number): string => {
   if (sex === "female") {
     if (value < 18) return "Abaixo do ideal";
@@ -289,16 +325,15 @@ const BodyFatCalculator: React.FC = () => {
 
     const height = Number(measurements.height);
     const neck = Number(measurements.neck);
-    const waist = sex === "female" ? Number(measurements.waist) : Number(measurements.abdomen);
-    const hip = sex === "female" ? Number(measurements.hip) : Number(measurements.abdomen);
+    const waist = sex === "female" ? Number(measurements.waist) : undefined;
+    const hip = sex === "female" ? Number(measurements.hip) : undefined;
+    const abdomen = sex === "male" ? Number(measurements.abdomen) : undefined;
 
-    const circumferenceTerm = waist + hip - neck;
-    if (circumferenceTerm <= 0 || height <= 0) {
+    const bodyFat = calculateBodyFat(sex, { height, waist, hip, neck, abdomen });
+    if (bodyFat === null) {
       setSubmitError("As combinações de medidas precisam ser maiores que zero. Revise as medidas.");
       return;
     }
-
-    const bodyFat = 163.205 * Math.log10(circumferenceTerm) - 97.684 * Math.log10(height) - 78.387;
     const value = Number(bodyFat.toFixed(1));
     const classification = classifyBodyFat(sex, value);
 
