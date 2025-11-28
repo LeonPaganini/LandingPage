@@ -148,6 +148,28 @@ const classifyBodyFat = (sex: Sex, value: number): string => {
   return "Acima do ideal";
 };
 
+const selectPersonalizedPhrase = (classification: string) => {
+  const normalized = classification.toLowerCase();
+
+  if (normalized.includes("excelente")) {
+    return "Excelente resultado! Mantenha sua rotina e inspire outras pessoas.";
+  }
+
+  if (normalized.includes("saud")) {
+    return "Na média ideal! Continue evoluindo!";
+  }
+
+  if (normalized.includes("acima")) {
+    return "Agora sei exatamente onde melhorar — e você pode descobrir o seu também.";
+  }
+
+  if (normalized.includes("abaixo")) {
+    return "Volume baixo! Mas saúde é equilíbrio. Confira o seu também.";
+  }
+
+  return "Na média ideal! Continue evoluindo!";
+};
+
 const loadCachedState = () => {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -441,6 +463,11 @@ const BodyFatCalculator: React.FC = () => {
   };
 
   const downloadInstagramPost = async () => {
+    if (!result) {
+      setSubmitError("Calcule seu percentual antes de gerar a arte compartilhável.");
+      return;
+    }
+
     try {
       setIsDownloading(true);
       const width = 1080;
@@ -451,69 +478,142 @@ const BodyFatCalculator: React.FC = () => {
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas não suportado");
 
+      const drawRoundedRect = (
+        context: CanvasRenderingContext2D,
+        x: number,
+        y: number,
+        rectWidth: number,
+        rectHeight: number,
+        radius: number
+      ) => {
+        context.beginPath();
+        context.moveTo(x + radius, y);
+        context.lineTo(x + rectWidth - radius, y);
+        context.quadraticCurveTo(x + rectWidth, y, x + rectWidth, y + radius);
+        context.lineTo(x + rectWidth, y + rectHeight - radius);
+        context.quadraticCurveTo(x + rectWidth, y + rectHeight, x + rectWidth - radius, y + rectHeight);
+        context.lineTo(x + radius, y + rectHeight);
+        context.quadraticCurveTo(x, y + rectHeight, x, y + rectHeight - radius);
+        context.lineTo(x, y + radius);
+        context.quadraticCurveTo(x, y, x + radius, y);
+        context.closePath();
+        context.fill();
+      };
+
+      const drawWrappedText = (
+        context: CanvasRenderingContext2D,
+        text: string,
+        x: number,
+        y: number,
+        maxWidth: number,
+        lineHeight: number
+      ) => {
+        const words = text.split(" ");
+        let line = "";
+        let currentY = y;
+
+        for (let n = 0; n < words.length; n += 1) {
+          const testLine = `${line}${words[n]} `;
+          const metrics = context.measureText(testLine);
+          if (metrics.width > maxWidth && n > 0) {
+            context.fillText(line.trim(), x, currentY);
+            line = `${words[n]} `;
+            currentY += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        context.fillText(line.trim(), x, currentY);
+        return currentY + lineHeight;
+      };
+
       const gradient = ctx.createLinearGradient(0, 0, width, height);
-      gradient.addColorStop(0, "rgba(46,106,80,0.92)");
-      gradient.addColorStop(1, "rgba(244,203,180,0.92)");
+      gradient.addColorStop(0, "#1f5c46");
+      gradient.addColorStop(0.5, "#3c8567");
+      gradient.addColorStop(1, "#f4e6d7");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
+      const accentGradient = ctx.createRadialGradient(width * 0.2, height * 0.2, 80, width * 0.2, height * 0.2, 380);
+      accentGradient.addColorStop(0, "rgba(255,255,255,0.45)");
+      accentGradient.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = accentGradient;
+      ctx.fillRect(0, 0, width, height);
+
+      const accentGradient2 = ctx.createRadialGradient(width * 0.8, height * 0.8, 80, width * 0.8, height * 0.8, 420);
+      accentGradient2.addColorStop(0, "rgba(255,255,255,0.2)");
+      accentGradient2.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = accentGradient2;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = "rgba(255,255,255,0.28)";
+      drawRoundedRect(ctx, 70, 120, width - 140, height - 240, 38);
+
       ctx.fillStyle = "rgba(255,255,255,0.16)";
-      ctx.fillRect(80, 140, width - 160, height - 280);
+      drawRoundedRect(ctx, 110, 180, width - 220, height - 360, 32);
 
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 64px 'Inter', 'Helvetica Neue', Arial";
       ctx.textAlign = "center";
-      ctx.fillText("Calculadora de Gordura", width / 2, 260);
+      ctx.fillStyle = "#0f2f22";
+      ctx.font = "800 60px 'Poppins', 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillText("Meu Resultado – % de Gordura Corporal", width / 2, 260);
 
-      ctx.font = "600 42px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Método Marinha Americana", width / 2, 330);
+      ctx.font = "600 34px 'Poppins', 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillStyle = "#10392a";
+      ctx.fillText("Método Marinha Americana", width / 2, 318);
 
-      ctx.font = "400 32px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Use medidas simples e descubra sua % em segundos", width / 2, 420);
+      const contentStart = 410;
+      ctx.fillStyle = "#0f2f22";
+      ctx.font = "600 30px 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillText("📊 Meu percentual de gordura:", width / 2, contentStart);
 
-      ctx.font = "400 30px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Acesse o site e calcule agora", width / 2, 500);
+      ctx.font = "900 170px 'Poppins', 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillStyle = "#0c241a";
+      ctx.fillText(`${result.value.toFixed(1)}%`, width / 2, contentStart + 170);
 
-      ctx.font = "600 140px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillStyle = "#1F2622";
-      ctx.fillText("%", width / 2, 680);
+      ctx.font = "600 42px 'Poppins', 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillStyle = "#0f2f22";
+      ctx.fillText(`Faixa: ${result.classification}`, width / 2, contentStart + 240);
 
       ctx.font = "500 34px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText("Post pronto em 1080x1350", width / 2, 820);
-
-      const glassGradient = ctx.createLinearGradient(0, 0, width, 0);
-      glassGradient.addColorStop(0, "rgba(255,255,255,0.55)");
-      glassGradient.addColorStop(1, "rgba(255,255,255,0.25)");
-      ctx.fillStyle = glassGradient;
-      const glassX = 180;
-      const glassY = 900;
-      const glassWidth = width - 360;
-      const glassHeight = 200;
-      const radius = 32;
-      ctx.beginPath();
-      ctx.moveTo(glassX + radius, glassY);
-      ctx.lineTo(glassX + glassWidth - radius, glassY);
-      ctx.quadraticCurveTo(glassX + glassWidth, glassY, glassX + glassWidth, glassY + radius);
-      ctx.lineTo(glassX + glassWidth, glassY + glassHeight - radius);
-      ctx.quadraticCurveTo(
-        glassX + glassWidth,
-        glassY + glassHeight,
-        glassX + glassWidth - radius,
-        glassY + glassHeight
+      ctx.fillStyle = "#0f2f22";
+      const afterPersonalized = drawWrappedText(
+        ctx,
+        selectPersonalizedPhrase(result.classification),
+        width / 2,
+        contentStart + 310,
+        width - 300,
+        44
       );
-      ctx.lineTo(glassX + radius, glassY + glassHeight);
-      ctx.quadraticCurveTo(glassX, glassY + glassHeight, glassX, glassY + glassHeight - radius);
-      ctx.lineTo(glassX, glassY + radius);
-      ctx.quadraticCurveTo(glassX, glassY, glassX + radius, glassY);
-      ctx.closePath();
-      ctx.fill();
 
-      ctx.fillStyle = "#1F4D3A";
-      ctx.font = "600 36px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Calculadora % Gordura", width / 2, 990);
-      ctx.font = "400 30px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Pronta para compartilhar", width / 2, 1040);
+      ctx.font = "700 36px 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillStyle = "#0b1f17";
+      const afterViral = drawWrappedText(
+        ctx,
+        "Compartilhe o seu também e me marque!",
+        width / 2,
+        afterPersonalized + 36,
+        width - 260,
+        42
+      );
+
+      const ctaY = afterViral + 70;
+      ctx.fillStyle = "rgba(16,57,42,0.9)";
+      drawRoundedRect(ctx, width / 2 - 230, ctaY - 52, 460, 120, 26);
+      ctx.fillStyle = "#f2f5f0";
+      ctx.font = "800 40px 'Poppins', 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillText("Calcule Gratuitamente", width / 2, ctaY);
+
+      ctx.font = "500 26px 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillStyle = "#e6eee5";
+      ctx.fillText("Descubra o seu resultado em 10 segundos.", width / 2, ctaY + 42);
+
+      ctx.font = "500 22px 'Inter', 'Helvetica Neue', Arial";
+      ctx.fillStyle = "#0f2f22";
+      ctx.fillText(
+        "Calculadora de Gordura – Desenvolvida por Nutri Thaís Paganini",
+        width / 2,
+        height - 120
+      );
 
       const link = document.createElement("a");
       link.download = "calculadora-gordura-marinha-instagram.png";
