@@ -259,11 +259,25 @@ const Testimonials: React.FC = () => (
       <SectionTitle label="Depoimentos" />
       <div className="flex gap-4 overflow-x-auto pb-4">
         {testimonials.map((item) => (
-          <GlassCard key={item.name} className="min-w-[260px] max-w-sm flex-1 p-5">
-            <p className="text-sm italic text-neutral-900">“{item.text}”</p>
-            <div className="mt-3 text-sm font-semibold text-neutral-600">{item.name}</div>
-            <div className="mt-2 inline-flex rounded-full bg-surface-100/60 px-3 py-1 text-xs font-semibold text-neutral-900">
-              {item.tag}
+          <GlassCard
+            key={item.name}
+            className="min-w-[260px] max-w-sm flex-1 p-5"
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+              <div className="relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-primary-300 via-peach-500/80 to-blush-300 p-[2px] sm:h-16 sm:w-16">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="h-full w-full rounded-full object-cover bg-surface-100"
+                />
+              </div>
+              <div className="flex-1 space-y-3">
+                <p className="text-sm italic text-neutral-900">“{item.text}”</p>
+                <div className="text-sm font-semibold text-neutral-600">{item.name}</div>
+                <div className="inline-flex rounded-full bg-surface-100/60 px-3 py-1 text-xs font-semibold text-neutral-900">
+                  {item.tag}
+                </div>
+              </div>
             </div>
           </GlassCard>
         ))}
