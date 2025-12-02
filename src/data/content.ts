@@ -29,7 +29,7 @@ export const hero = {
 };
 
 export const diagnostic = {
-  title: "O que está realmente te atrapalhando hoje?",
+  title: "Marque o que está realmente te atrapalhando hoje!",
   symptoms: [
     "Inchaço frequente",
     "TPM forte e oscilação de humor",
