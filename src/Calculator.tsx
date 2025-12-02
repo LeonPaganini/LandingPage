@@ -1,5 +1,5 @@
 import React from "react";
-import { enviarLeadParaPlanilha } from "./leadService";
+import { enviarLeadParaPlanilha } from "./leadService.js";
 
 const STORAGE_KEY = "bodyFatCalculatorState";
 

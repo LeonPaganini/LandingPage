@@ -11,53 +11,8 @@ import {
   testimonials,
 } from "./data/content";
 import BodyFatCalculator from "./Calculator";
-
-const SectionTitle: React.FC<{ label: string }> = ({ label }) => (
-  <h2 className="section-title text-neutral-900">{label}</h2>
-);
-
-const GlassCard: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
-  children,
-  className = "",
-}) => <div className={`glass-card ${className}`}>{children}</div>;
-
-const Badge: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <span className="badge-pill">{children}</span>
-);
-
-const CTAButton: React.FC<{ label: string; href?: string; onClick?: () => void }> = ({
-  label,
-  href,
-  onClick,
-}) => {
-  const handleClick = (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
-    if (onClick) {
-      event.preventDefault();
-      onClick();
-    }
-  };
-
-  if (href) {
-    return (
-      <a className="button-primary" href={href} onClick={handleClick}>
-        {label}
-      </a>
-    );
-  }
-
-  return (
-    <button type="button" className="button-primary" onClick={onClick}>
-      {label}
-    </button>
-  );
-};
-
-const SectionWave: React.FC<React.PropsWithChildren<{ className?: string }>> = ({
-  children,
-  className = "",
-}) => (
-  <section className={`section-wave ${className} pb-16 pt-12 md:pt-16`}>{children}</section>
-);
+import ResetNutricionalPage from "./ResetNutricional.js";
+import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
 
 const Hero: React.FC = () => (
   <section className="relative overflow-hidden bg-gradient-to-br from-primary-700/75 via-peach-500/70 to-surface-200/80 text-neutral-900">
@@ -200,13 +155,17 @@ const About: React.FC = () => (
   </SectionWave>
 );
 
-const Methods: React.FC<{ onNavigateToCalculator: () => void }> = ({ onNavigateToCalculator }) => (
+const Methods: React.FC<{ onNavigateToCalculator: () => void; onNavigateToReset: () => void }> = ({
+  onNavigateToCalculator,
+  onNavigateToReset,
+}) => (
   <SectionWave className="bg-gradient-to-b from-peach-500/40 via-surface-100 to-white">
     <div className="mx-auto max-w-6xl px-6">
       <SectionTitle label="Métodos & Programas" />
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {programs.map((program) => {
           const goToCalculator = program.cta.toLowerCase().includes("calcular");
+          const isReset = program.title.toLowerCase().includes("reset nutricional");
           return (
             <GlassCard key={program.title} className="p-6 transition hover:-translate-y-1">
               <div className="flex flex-col gap-3">
@@ -226,8 +185,20 @@ const Methods: React.FC<{ onNavigateToCalculator: () => void }> = ({ onNavigateT
                 <div className="pt-2">
                   <CTAButton
                     label={program.cta}
-                    href={goToCalculator ? "?page=calculadora_gordura" : undefined}
-                    onClick={goToCalculator ? onNavigateToCalculator : undefined}
+                    href={
+                      goToCalculator
+                        ? "?page=calculadora_gordura"
+                        : isReset
+                          ? "/reset-nutricional"
+                          : undefined
+                    }
+                    onClick={
+                      goToCalculator
+                        ? onNavigateToCalculator
+                        : isReset
+                          ? onNavigateToReset
+                          : undefined
+                    }
                   />
                 </div>
               </div>
@@ -357,12 +328,15 @@ const Footer: React.FC = () => (
   </footer>
 );
 
-const LandingContent: React.FC<{ onNavigateToCalculator: () => void }> = ({ onNavigateToCalculator }) => (
+const LandingContent: React.FC<{
+  onNavigateToCalculator: () => void;
+  onNavigateToReset: () => void;
+}> = ({ onNavigateToCalculator, onNavigateToReset }) => (
   <>
     <Hero />
     <Diagnostic />
     <About />
-    <Methods onNavigateToCalculator={onNavigateToCalculator} />
+    <Methods onNavigateToCalculator={onNavigateToCalculator} onNavigateToReset={onNavigateToReset} />
     <Story />
     <Benefits />
     <Testimonials />
@@ -372,32 +346,51 @@ const LandingContent: React.FC<{ onNavigateToCalculator: () => void }> = ({ onNa
 );
 
 const App: React.FC = () => {
-  const getIsCalculator = React.useCallback(() => {
-    return new URLSearchParams(window.location.search).get("page") === "calculadora_gordura";
+  type ActivePage = "home" | "calculator" | "reset-nutricional";
+
+  const getActivePage = React.useCallback((): ActivePage => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("page") === "calculadora_gordura") return "calculator";
+
+    const pathname = window.location.pathname.replace(/\/$/, "");
+    if (pathname.endsWith("/reset-nutricional")) return "reset-nutricional";
+
+    return "home";
   }, []);
 
-  const [isCalculator, setIsCalculator] = React.useState<boolean>(getIsCalculator);
+  const [activePage, setActivePage] = React.useState<ActivePage>(getActivePage);
 
   React.useEffect(() => {
-    const handlePopState = () => setIsCalculator(getIsCalculator());
+    const handlePopState = () => setActivePage(getActivePage());
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [getIsCalculator]);
+  }, [getActivePage]);
 
   const navigateToCalculator = React.useCallback(() => {
     const url = new URL(window.location.href);
     url.searchParams.set("page", "calculadora_gordura");
+    url.pathname = "/";
     window.history.pushState({}, "", url);
-    setIsCalculator(true);
+    setActivePage("calculator");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const navigateToReset = React.useCallback(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("page");
+    url.pathname = "/reset-nutricional";
+    window.history.pushState({}, "", url);
+    setActivePage("reset-nutricional");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const navigateHome = React.useCallback(() => {
     const url = new URL(window.location.href);
     url.searchParams.delete("page");
+    url.pathname = "/";
     const normalized = `${url.pathname}${url.search}${url.hash}`;
     window.history.pushState({}, "", normalized);
-    setIsCalculator(false);
+    setActivePage("home");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -418,11 +411,11 @@ const App: React.FC = () => {
           </div>
         </div>
       </header>
-      {isCalculator ? (
-        <BodyFatCalculator />
-      ) : (
-        <LandingContent onNavigateToCalculator={navigateToCalculator} />
+      {activePage === "calculator" && <BodyFatCalculator />}
+      {activePage === "home" && (
+        <LandingContent onNavigateToCalculator={navigateToCalculator} onNavigateToReset={navigateToReset} />
       )}
+      {activePage === "reset-nutricional" && <ResetNutricionalPage onNavigateHome={navigateHome} />}
       <Footer />
     </main>
   );
