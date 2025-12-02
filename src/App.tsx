@@ -85,20 +85,20 @@ const Diagnostic: React.FC = () => {
                   key={item}
                   type="button"
                   onClick={() => toggleSymptom(item)}
-                  className={`group flex items-start gap-3 rounded-2xl p-3 text-left transition focus:outline-none focus:ring-2 focus:ring-primary-700/60 ${
-                    isSelected ? "bg-white/80 shadow-lg" : "hover:bg-white/60"
+                  className={`group flex items-start gap-3 rounded-xl border border-transparent bg-white/40 p-3 text-left transition ease-out focus:outline-none focus:ring-2 focus:ring-primary-700/60 ${
+                    isSelected ? "selected-item" : "hover:bg-white/60 hover:border-white/70"
                   }`}
                 >
                   <span
                     className={`icon-circle text-lg transition-colors ${
-                      isSelected ? "bg-neutral-900 text-white" : ""
+                      isSelected ? "bg-[var(--deep-forest)] text-white shadow-md" : ""
                     }`}
                   >
                     ✓
                   </span>
                   <p
                     className={`card-text text-base transition-colors ${
-                      isSelected ? "font-semibold text-neutral-900" : ""
+                      isSelected ? "font-semibold text-[var(--deep-forest)]" : ""
                     }`}
                   >
                     {item}

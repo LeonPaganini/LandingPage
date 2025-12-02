@@ -21,6 +21,13 @@
   --bg-soft-1: #f6f4f2;
   --bg-soft-2: #efeae6;
 
+  /* Wellness palette */
+  --primary-green-tint: #e3f2e9;
+  --secondary-mint: #9ecfb3;
+  --secondary-sage: #c6d9c7;
+  --primary-green-soft: #66a37f;
+  --deep-forest: #355f4f;
+
   /* RGBA tokens */
   --primary-500-rgba: 62, 140, 103;
   --olive-700-rgba: 85, 98, 71;
@@ -97,4 +104,18 @@ body {
 
 .icon-circle {
   @apply flex h-12 w-12 items-center justify-center rounded-full bg-white/70 text-primary-700 shadow-inner;
+}
+
+.selected-item {
+  @apply relative border rounded-xl shadow-md transition ease-out duration-200;
+  background: var(--primary-green-tint);
+  border-color: var(--primary-green-soft);
+  color: var(--deep-forest);
+  box-shadow: 0 12px 28px rgba(53, 95, 79, 0.12);
+}
+
+.selected-item:hover {
+  background: var(--primary-green-tint);
+  border-color: var(--primary-green-soft);
+  color: var(--deep-forest);
 }
