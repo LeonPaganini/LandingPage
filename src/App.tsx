@@ -286,21 +286,76 @@ const Testimonials: React.FC = () => (
   </SectionWave>
 );
 
-const FAQ: React.FC = () => (
-  <SectionWave className="bg-gradient-to-b from-blush-300/30 via-surface-100 to-white">
-    <div className="mx-auto max-w-5xl px-6">
-      <SectionTitle label="Perguntas frequentes" />
-      <div className="grid gap-4 md:grid-cols-2">
-        {faq.map((item) => (
-          <GlassCard key={item.q} className="p-5">
-            <p className="card-title text-base">{item.q}</p>
-            <p className="card-text mt-1">{item.a}</p>
-          </GlassCard>
-        ))}
+const FAQ: React.FC = () => {
+  const [openItems, setOpenItems] = React.useState<Set<number>>(new Set());
+
+  const toggleItem = (index: number) => {
+    setOpenItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
+  return (
+    <SectionWave className="bg-gradient-to-b from-blush-300/30 via-surface-100 to-white">
+      <div className="mx-auto max-w-5xl px-6">
+        <SectionTitle label="Perguntas frequentes" />
+        <div className="grid gap-4 md:grid-cols-2">
+          {faq.map((item, index) => {
+            const isOpen = openItems.has(index);
+            const contentId = `faq-answer-${index}`;
+            return (
+              <div
+                key={item.q}
+                className="rounded-xl border border-white/70 bg-white/70 p-3 shadow-sm backdrop-blur"
+              >
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={contentId}
+                  onClick={() => toggleItem(index)}
+                  className="flex w-full items-center justify-between gap-3 rounded-lg px-2 py-1 text-left transition-colors hover:bg-white/70"
+                >
+                  <span className="text-base font-semibold text-neutral-900">{item.q}</span>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-100 text-neutral-900 shadow-inner">
+                    <svg
+                      className={`h-5 w-5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5.5 7.5L10 12l4.5-4.5"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </button>
+                <div
+                  id={contentId}
+                  role="region"
+                  className={`overflow-hidden text-sm text-neutral-600 transition-all duration-300 ease-in-out ${
+                    isOpen ? "mt-2 max-h-40 opacity-100" : "max-h-0 opacity-0"
+                  }`}
+                >
+                  <p className="rounded-lg bg-white/70 px-2 py-2 leading-relaxed">{item.a}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  </SectionWave>
-);
+    </SectionWave>
+  );
+};
 
 const FinalCTA: React.FC = () => (
   <section className="relative overflow-hidden bg-gradient-to-br from-primary-700/70 via-peach-500/60 to-blush-300/60 text-white">
