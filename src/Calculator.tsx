@@ -449,16 +449,9 @@ const BodyFatCalculator: React.FC = () => {
 
     void salvarLeadCalculadora({
       nome: trimmedName,
-      celular: leadInfo.phone,
-      genero: sex === "female" ? "feminino" : "masculino",
-      resultado_gordura: value,
-      dados_medidas: {
-        altura_cm: height,
-        pescoco_cm: neck,
-        cintura_cm: sex === "female" ? waist : undefined,
-        quadril_cm: sex === "female" ? hip : undefined,
-        abdomen_cm: sex === "male" ? abdomen : undefined,
-      },
+      telefone: leadInfo.phone,
+      sexo: sex === "female" ? "feminino" : "masculino",
+      resultado: value,
     });
   };
 

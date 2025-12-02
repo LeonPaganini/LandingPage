@@ -1,42 +1,34 @@
-export type LeadMeasurementPayload = {
-  altura_cm: number;
-  pescoco_cm: number;
-  cintura_cm?: number;
-  quadril_cm?: number;
-  abdomen_cm?: number;
-};
-
 export type LeadCalculadoraPayload = {
   nome: string;
-  celular: string;
-  genero: "feminino" | "masculino";
-  resultado_gordura: number;
-  dados_medidas: LeadMeasurementPayload;
+  telefone: string;
+  sexo: "feminino" | "masculino";
+  resultado: number;
 };
 
 const LEAD_ORIGEM = "calculadora_gordura_marinha";
+const ENDPOINT = "/api/leads/calculadora-gordura";
+
+const construirPayload = (payload: LeadCalculadoraPayload) => ({
+  ...payload,
+  origem: LEAD_ORIGEM,
+});
 
 export const salvarLeadCalculadora = async (payload: LeadCalculadoraPayload) => {
-  const enrichedPayload = {
-    ...payload,
-    origem: LEAD_ORIGEM,
-    data_hora: new Date().toISOString(),
-  };
-
   try {
-    const response = await fetch("/api/leads", {
+    const response = await fetch(ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(enrichedPayload),
+      body: JSON.stringify(construirPayload(payload)),
     });
 
     if (!response.ok) {
-      throw new Error(`Falha ao salvar lead: ${response.status}`);
+      const message = await response.text().catch(() => "");
+      throw new Error(`Falha ao salvar lead (${response.status}): ${message}`);
     }
   } catch (error) {
-    // Ponto de extensão: futura integração com Google Sheets pode ser adicionada aqui.
+    // Fluxo não deve bloquear a calculadora; apenas registramos o erro localmente.
     console.error("Não foi possível salvar o lead da calculadora", error);
   }
 };

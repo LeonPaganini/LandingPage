@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "tsc -p tsconfig.test.json && node --test dist-tests/tests"
+    "test": "tsc -p tsconfig.test.json && node --test dist-tests/tests",
+    "start": "node server.js"
   },
   "dependencies": {
     "react": "^18.3.1",
