@@ -1,113 +1,59 @@
 import http from "node:http";
 import { URL } from "node:url";
-import { createSign } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
+import { google } from "googleapis";
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 const SPREADSHEET_ID = "1SwN3j3l7MRs57knGUey616wS7_V3pmE2QCKsrbRRBy4";
 const SHEET_RANGE = "Leads!A:D";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
-const credentialsEnv = process.env.CREDENTIALS;
+let sheetsClient;
 
-if (!credentialsEnv) {
-  console.warn("Variável de ambiente CREDENTIALS não encontrada. As gravações no Google Sheets falharão.");
-}
+const loadGoogleCredentials = () => {
+  const possiblePaths = ["/etc/secrets/credentials.json", "./credentials.json"];
 
-const parsedCredentials = (() => {
-  if (!credentialsEnv) return null;
-  try {
-    const parsed = JSON.parse(credentialsEnv);
-    return {
-      ...parsed,
-      private_key: typeof parsed.private_key === "string" ? parsed.private_key.replace(/\\n/g, "\n") : parsed.private_key,
-    };
-  } catch (error) {
-    console.error("Não foi possível interpretar as credenciais do Google", error);
-    return null;
-  }
-})();
-
-let cachedToken = { token: "", expiresAt: 0 };
-
-const base64Url = (input) =>
-  Buffer.from(input)
-    .toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-
-const fetchAccessToken = async () => {
-  if (!parsedCredentials) {
-    throw new Error("Credenciais não configuradas.");
+  for (const credentialsPath of possiblePaths) {
+    if (existsSync(credentialsPath)) {
+      try {
+        const raw = readFileSync(credentialsPath, "utf8");
+        const parsed = JSON.parse(raw);
+        return {
+          ...parsed,
+          private_key: typeof parsed.private_key === "string" ? parsed.private_key.replace(/\\n/g, "\n") : parsed.private_key,
+        };
+      } catch (error) {
+        throw new Error("Não foi possível ler as credenciais do Google.");
+      }
+    }
   }
 
-  const now = Math.floor(Date.now() / 1000);
-  if (cachedToken.token && cachedToken.expiresAt - 60 > now) {
-    return cachedToken.token;
+  throw new Error("Google credentials file not found.");
+};
+
+const getSheetsClient = () => {
+  if (!sheetsClient) {
+    const credentials = loadGoogleCredentials();
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: [SCOPES],
+    });
+
+    sheetsClient = google.sheets({ version: "v4", auth });
   }
 
-  const header = { alg: "RS256", typ: "JWT" };
-  const payload = {
-    iss: parsedCredentials.client_email,
-    scope: SCOPES,
-    aud: "https://oauth2.googleapis.com/token",
-    exp: now + 3600,
-    iat: now,
-  };
-
-  const toEncode = `${base64Url(JSON.stringify(header))}.${base64Url(JSON.stringify(payload))}`;
-  const signer = createSign("RSA-SHA256");
-  signer.update(toEncode);
-  signer.end();
-  const signature = signer.sign(parsedCredentials.private_key, "base64");
-  const jwt = `${toEncode}.${signature.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_")}`;
-
-  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt,
-    }).toString(),
-  });
-
-  if (!tokenResponse.ok) {
-    const message = await tokenResponse.text();
-    throw new Error(`Falha ao obter token do Google: ${message}`);
-  }
-
-  const tokenJson = await tokenResponse.json();
-  cachedToken = {
-    token: tokenJson.access_token,
-    expiresAt: now + Number(tokenJson.expires_in ?? 0),
-  };
-
-  return cachedToken.token;
+  return sheetsClient;
 };
 
 const appendLeadToSheet = async (values) => {
-  const accessToken = await fetchAccessToken();
-  const url = new URL(
-    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(
-      SHEET_RANGE
-    )}:append`
-  );
-  url.searchParams.set("valueInputOption", "USER_ENTERED");
-  url.searchParams.set("insertDataOption", "INSERT_ROWS");
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ values }),
+  const sheets = getSheetsClient();
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SPREADSHEET_ID,
+    range: SHEET_RANGE,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values },
   });
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(`Erro ao registrar lead no Google Sheets: ${message}`);
-  }
 };
 
 const parseJsonBody = (req) =>
