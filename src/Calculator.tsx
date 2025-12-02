@@ -1,5 +1,5 @@
 import React from "react";
-import { salvarLeadCalculadora } from "./leadService.js";
+import { enviarLeadParaPlanilha } from "./leadService";
 
 const STORAGE_KEY = "bodyFatCalculatorState";
 
@@ -447,7 +447,7 @@ const BodyFatCalculator: React.FC = () => {
     setResult({ value, classification });
     setSubmitError("");
 
-    void salvarLeadCalculadora({
+    void enviarLeadParaPlanilha({
       nome: trimmedName,
       telefone: leadInfo.phone,
       sexo: sex === "female" ? "feminino" : "masculino",
