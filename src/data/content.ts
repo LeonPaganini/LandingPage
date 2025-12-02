@@ -18,114 +18,176 @@ export const palette = {
 };
 
 export const hero = {
-  title: "Nutrição feminina que abraça sua rotina",
+  title: "Nutrição que abraça sua rotina",
   subtitle:
-    "Acabe com o inchaço, TPM intensa e cansaço constante com planos guiados, humanos e feitos para mulheres reais.",
-  badges: ["+3.200 mulheres acompanhadas", "Planos 100% personalizados", "Apoio leve, sem dietas malucas"],
+    "Reduza inchaço, fadiga, ansiedade alimentar e o sobrepeso com planos guiados, humanos e feitos para pessoas reais — com rotinas reais.",
+  badges: ["+1000 pessoas acompanhadas", "Planos 100% personalizados", "Equilíbrio, não restrição"],
   image:
     "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1400&q=80",
-  ctaPrimary: "Agendar conversa",
-  ctaSecondary: "Receber plano guiado",
+  ctaPrimary: "Quero saber mais",
+  ctaSecondary: "Já decidi! Quero agendar!",
 };
 
 export const diagnostic = {
-  title: "Isso é você?",
+  title: "O que está realmente te atrapalhando hoje?",
   symptoms: [
-    "Inchaço que não vai embora",
+    "Inchaço frequente",
     "TPM forte e oscilação de humor",
+    "Pele oleosa ou com acne",
+    "Dificuldade para emagrecer",
+    "Reganho de peso após dietas restritivas",
     "Ansiedade e vontade de beliscar",
     "Compulsão no fim do dia",
     "Intestino preso ou irregular",
     "Cansaço mesmo dormindo bem",
+    "Vontade constante de desistir"
   ],
-  tagline: "Se você marcou 2 ou mais, a Thaís pode ajustar seu caminho.",
+  tagline: "Se alguns desses pontos fizerem parte da sua rotina, existe um caminho mais leve — e ele começa aqui.",
 };
 
 export const about = {
-  title: "Quem é Thaís",
+  title: "Quem sou eu?",
   text:
-    "Sou Thaís Paganini, nutricionista que acredita em cuidado real, feito na medida da sua rotina. Nada de proibições vazias: você aprende, sente alívio e mantém resultados sem sofrimento.",
+    "Sou Thaís Paganini, nutricionista que ajuda pessoas a emagrecer de forma leve e emocional. Trabalho com ajustes simples, sem dietas extremas e restritivas. Te entrego ferramentas para uma rotina sustentável e prazerosa.",
   bullets: [
-    "Especialista em nutrição feminina e sintomas de TPM",
-    "+8 anos em consultório e acompanhamento digital",
-    "Protocolos leves: rotina, humor, sono e saciedade",
+    "Mais de 4 anos guiando pessoas cansadas de tentativas frustradas",
+    "Especialista em sintomas como inchaço, fadiga, compulsão e humor instável",
+    "Protocolos leves: você entende, melhora e se mantém bem sem sofrer",
   ],
   image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
 };
 
 export const programs = [
   {
-    title: "Reset Nutricional (21 dias)",
-    desc: "Plano rápido para desinchar e estabilizar energia em 3 semanas.",
-    bullets: ["Cardápio guiado", "Check-ins leves", "Receitas práticas"],
+    title: "Reset Nutricional (Grupo de emagrecimento 21 dias) - Sazonal",
+    desc: "Plano estratégico para redução de peso em 3 semanas.",
+    bullets: ["Cardápio guiado", "Orientações Nutricionais,", "Premiações", "Receitas"],
     cta: "Quero o Reset",
   },
   {
-    title: "Consultoria Individual",
-    desc: "Sessões 1:1 focadas na sua rotina, emoções e agenda real.",
+    title: "Consultoria Individual - Online",
+    desc: "Anamnese, Analise de composição corporal online, Plano alimentar individualizado, Lista de compras, Orientações nutricionais, Metas, Pedido de exames, Suporte via WhatsApp de 30 dias.",
     bullets: ["Mapa de hábitos", "Plano flexível", "Suporte via app"],
     cta: "Reservar consultoria",
   },
   {
-    title: "Protocolos Especiais",
-    desc: "Detox gentil, sono e TPM: ajustes precisos para cada fase.",
-    bullets: ["Ciclos femininos", "Checklist semanal", "Guias simples"],
-    cta: "Escolher protocolo",
-  },
+  title: "Protocolos Especiais",
+  desc: "Acompanhamento trimestral para quem usa GLP-1, com avaliação completa, plano alimentar individualizado, ajustes em 45 dias, lista de compras, metas e suporte via WhatsApp.",
+  bullets: [
+    "Avaliação e reavaliação completas",
+    "Plano alimentar para 90 dias",
+    "Suporte e ajustes contínuos"
+  ],
+  cta: "Escolher protocolo",
+},
   {
-    title: "AppNutri — Saúde Inteligente",
-    desc: "Acompanhe progresso, lembretes e suporte em um só lugar.",
-    bullets: ["Alertas gentis", "Histórico visual", "Mensagens da Thaís"],
-    cta: "Testar o app",
-  },
+  title: "AppNutri — Nutrição Inteligente",
+  desc: "Envie seus dados e receba uma análise completa, insights personalizados e um plano alimentar feito sob medida para você.",
+  bullets: [
+    "Interpretação inteligente dos seus dados",
+    "Insights claros sobre sua saúde e rotina",
+    "Plano alimentar completo e personalizado"
+  ],
+  cta: "Testar o App",
+},
   {
-    title: "Calculadora de % de Gordura",
-    desc: "Descubra sua composição corporal e metas realistas.",
-    bullets: ["Resultado rápido", "Meta segura", "Orientação inicial"],
-    cta: "Calcular agora",
-  },
+  title: "Calculadora de % de Gordura",
+  desc: "Descubra sua composição corporal, entenda sua faixa ideal e receba uma recomendação inicial baseada no seu resultado.",
+  bullets: [
+    "Resultado claro e imediato",
+    "Faixa ideal para seu perfil",
+    "Recomendação do melhor caminho"
+  ],
+  cta: "Calcular agora",
+},
   {
-    title: "Protolos focados em Análogos de LGP1",
-    desc: "Acompanhamento, protocolo de fitoterápicos e plano personalizado.",
-    bullets: ["Resultado rápido", "Meta segura", "Orientação inicial"],
-    cta: "Calcular agora",
-  },
+  title: "Protocolo 3M — Nutri + Médico",
+  desc: "Acompanhamento trimestral completo com avaliação, plano alimentar individualizado, prescrição médica e ajustes em 45 dias para garantir segurança e resultado.",
+  bullets: [
+    "Avaliação nutricional e médica",
+    "Plano alimentar para 90 dias",
+    "Ajustes com nova avaliação em 45 dias"
+  ],
+  cta: "Conhecer o protocolo",
+},
 ];
 
 export const story = {
   title: "Transformação",
-  headline: "Você não precisa escolher entre comer bem e viver sua vida.",
+  headline: "Emagrecer não precisa ser um ciclo de recomeços. Existe um caminho claro, leve e definitivo.",
   bullets: [
-    "Você consegue dizer não sem culpa",
-    "Seu corpo desincha e sua energia volta",
-    "Você entende o que funciona para você",
+    "Você aprende a emagrecer sem passar fome",
+    "Seu corpo responde: peso desce e disposição sobe",
+    "Você descobre o que funciona e mantém o resultado"
   ],
   text:
-    "Thaís já esteve do outro lado: cansaço, ciclos desregulados e tentativas frustradas. Hoje, ela guia mulheres a conquistarem leveza com passos curtos, claros e possíveis.",
+    "Muita gente tenta emagrecer sozinha, corta tudo e acaba desistindo. Eu já vi isso milhares de vezes. Por isso meu método é direto: entender sua rotina, ajustar o necessário e te mostrar como ter resultado de verdade — de um jeito que você consegue manter.",
 };
 
 export const benefits = [
-  { icon: "🌀", title: "Desincha rápido", desc: "Resultados em 7-14 dias" },
-  { icon: "😊", title: "Humor mais estável", desc: "Menos oscilações na TPM" },
-  { icon: "⏱️", title: "Rotina real", desc: "Planos em 15 min/semana" },
-  { icon: "🌿", title: "Intestino regulado", desc: "Fluxo diário mais leve" },
-  { icon: "🤍", title: "Ansiedade sob controle", desc: "Snacks inteligentes" },
-  { icon: "🎯", title: "Metas seguras", desc: "Sem cortes extremos" },
+  {
+    icon: "",
+    title: "Emagrecimento que funciona",
+    desc: "Você segue um método claro e possível, sem cortar tudo e sem se sentir perdido."
+  },
+  {
+    icon: "",
+    title: "Resultado que aparece na balança",
+    desc: "Com ajustes certos, o peso começa a responder — sem sofrimento."
+  },
+  {
+    icon: "",
+    title: "Fome sob controle",
+    desc: "Você entende o que comer e quando comer, evitando exageros à noite."
+  },
+  {
+    icon: "",
+    title: "Rotina que cabe na sua vida",
+    desc: "Plano simples, direto e adaptado ao seu tempo — não o contrário."
+  },
+  {
+    icon: "",
+    title: "Mais energia no dia a dia",
+    desc: "Você sente o corpo mais leve e disposto conforme ajusta a alimentação."
+  },
+  {
+    icon: "",
+    title: "Resultado que você mantém",
+    desc: "Nada de efeito sanfona: você aprende o que funciona e sustenta o progresso."
+  }
 ];
 
 export const testimonials = [
   { name: "Marina, 34", text: "2 semanas de acompanhamento e meu inchaço simplesmente sumiu.", tag: "Reset Nutricional" },
-  { name: "Bruna, 27", text: "Parecia impossível parar a compulsão à noite. Hoje sinto controle e paz.", tag: "Consultoria Individual" },
-  { name: "Helena, 41", text: "TPM muito mais leve e meu humor agradece. Rotina possível!", tag: "Protocolos Especiais" },
+  { name: "Bruna, 27", text: "Parecia impossível parar a compulsão à noite. Hoje sinto que tenho mais controle.", tag: "Consultoria Individual" },
+  { name: "Helena, 41", text: "TPM muito mais leve e meu humor agradece. Amei", tag: "Protocolos Especiais" },
 ];
 
 export const faq = [
-  { q: "Preciso cortar tudo que gosto?", a: "Não. Trabalhamos equilíbrio e substituições simples, sem extremismos." },
-  { q: "E se eu tiver pouco tempo?", a: "Planos curtos, check-ins rápidos e receitas em até 15 minutos." },
-  { q: "Funciona sem academia?", a: "Sim. Ajustamos alimentação e movimento gentil dentro da sua rotina." },
-  { q: "Como são os pagamentos?", a: "Cartão ou Pix. Consultoria e protocolos podem ser parcelados." },
-  { q: "Vou receber cardápio fechado?", a: "Você recebe guias flexíveis, trocas fáceis e porções sob medida." },
-  { q: "Posso falar com a Thaís?", a: "Sim. Suporte dentro do app e momentos ao vivo para tirar dúvidas." },
+  {
+    q: "Preciso cortar tudo que gosto?",
+    a: "Não. O método é feito para a vida real: você aprende a equilibrar sua alimentação sem excluir tudo e sem sofrer. Isso aumenta suas chances de manter o emagrecimento a longo prazo."
+  },
+  {
+    q: "E se eu tiver pouco tempo?",
+    a: "A rotina corrida já faz parte da sua vida — e o plano leva isso em conta. Você recebe orientações simples, práticas e possíveis, que encaixam até nos dias mais cheios."
+  },
+  {
+    q: "Vou ter que seguir um cardápio fechado?",
+    a: "Não. Em vez de um cardápio engessado, você recebe um plano flexível, com trocas fáceis e opções que se adaptam ao que você tem em casa e ao que você gosta de comer."
+  },
+  {
+    q: "Como funciona o pagamento?",
+    a: "Você pode pagar por cartão ou Pix, e alguns protocolos permitem parcelamento. O objetivo é facilitar seu acesso ao cuidado, não complicar o processo."
+  },
+  {
+    q: "Posso falar com a Thaís em caso de dúvidas?",
+    a: "Sim. Dependendo do serviço escolhido, você terá suporte pelo App ou WhatsApp. É um acompanhamento leve para garantir que você não fique perdido no processo."
+  },
+  {
+    q: "E se eu já tiver tentado várias vezes emagrecer?",
+    a: "Isso é mais comum do que você imagina. Aqui, trabalhamos com estratégia e não com restrição extrema. O foco é entender sua rotina e ajustar o que te atrapalha de verdade."
+  }
 ];
 
 export const footer = {

@@ -189,9 +189,9 @@ const About: React.FC = () => (
             ))}
           </ul>
           <div className="mt-6 flex flex-wrap gap-3">
-            <CTAButton label="Quero orientação leve" />
+            <CTAButton label="Quero emagrecer de forma leve" />
             <button className="rounded-full border border-neutral-900/10 px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40">
-              Falar com a Thaís
+              Quero saber mais
             </button>
           </div>
         </GlassCard>
