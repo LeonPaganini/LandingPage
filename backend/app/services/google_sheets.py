@@ -1,27 +1,17 @@
 import logging
 import os
-from datetime import datetime, timezone
 from functools import lru_cache
 from typing import Optional
 
 import gspread
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def _current_timestamp() -> str:
+    from datetime import datetime, timezone
+
     return datetime.now(timezone.utc).astimezone().isoformat()
-
-
-class LeadPayload(BaseModel):
-    nome: str = Field(..., min_length=1)
-    telefone: str = Field(..., min_length=1)
-    sexo: str = Field(..., min_length=1)
-    resultado: str = Field(..., min_length=1)
 
 
 class GoogleSheetsService:
@@ -66,7 +56,7 @@ class GoogleSheetsService:
         self._worksheet = worksheet
         return worksheet
 
-    def append_lead(self, lead: LeadPayload):
+    def append_lead(self, lead):
         worksheet = self._get_worksheet()
         row = [lead.nome, lead.telefone, lead.sexo, lead.resultado, _current_timestamp()]
         try:
@@ -85,37 +75,3 @@ def get_sheets_service() -> GoogleSheetsService:
     worksheet_title = os.getenv("GOOGLE_SHEET_WORKSHEET")
 
     return GoogleSheetsService(credentials_path, sheet_id, worksheet_title)
-
-
-app = FastAPI(title="Landing Page Leads Service")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-
-
-@app.post("/api/leads/gordura-marinha")
-def create_lead(payload: LeadPayload):
-    try:
-        service = get_sheets_service()
-        service.append_lead(payload)
-    except Exception as exc:  # noqa: BLE001
-        logger.exception("Error saving lead")
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-    return {"ok": True}
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
