@@ -1,5 +1,5 @@
 import React from "react";
-import { enviarLeadParaPlanilha } from "./leadService.js";
+import { enviarLeadCalculadora } from "./lib/enviarLeadCalculadora.js";
 
 const STORAGE_KEY = "bodyFatCalculatorState";
 
@@ -447,7 +447,7 @@ const BodyFatCalculator: React.FC = () => {
     setResult({ value, classification });
     setSubmitError("");
 
-    void enviarLeadParaPlanilha({
+    void enviarLeadCalculadora({
       nome: trimmedName,
       telefone: leadInfo.phone,
       sexo: sex === "female" ? "feminino" : "masculino",
