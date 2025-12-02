@@ -158,9 +158,27 @@ export const benefits = [
 ];
 
 export const testimonials = [
-  { name: "Marina, 34", text: "2 semanas de acompanhamento e meu inchaço simplesmente sumiu.", tag: "Reset Nutricional" },
-  { name: "Bruna, 27", text: "Parecia impossível parar a compulsão à noite. Hoje sinto que tenho mais controle.", tag: "Consultoria Individual" },
-  { name: "Helena, 41", text: "TPM muito mais leve e meu humor agradece. Amei", tag: "Protocolos Especiais" },
+  {
+    name: "Marina, 34",
+    text: "2 semanas de acompanhamento e meu inchaço simplesmente sumiu.",
+    tag: "Reset Nutricional",
+    image:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "Bruna, 27",
+    text: "Parecia impossível parar a compulsão à noite. Hoje sinto que tenho mais controle.",
+    tag: "Consultoria Individual",
+    image:
+      "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "Helena, 41",
+    text: "TPM muito mais leve e meu humor agradece. Amei",
+    tag: "Protocolos Especiais",
+    image:
+      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80",
+  },
 ];
 
 export const faq = [
