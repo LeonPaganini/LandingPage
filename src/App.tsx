@@ -15,20 +15,17 @@ import ResetNutricionalPage from "./ResetNutricional.js";
 import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
 
 const Hero: React.FC = () => {
-  const heroMobilePosition = hero.imagePositionMobile ?? "40% 20%";
-  const heroDesktopPosition = hero.imagePositionDesktop ?? "60% 20%";
-
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary-700/75 via-peach-500/70 to-surface-200/80 text-neutral-900">
+    <section className="relative isolate overflow-hidden bg-bgBase pt-20 pb-16 md:pt-24 md:pb-24">
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <img
           src={hero.image}
-          alt=""
-          className={`h-full w-full object-cover md:object-[var(--hero-desktop-position)]`}
-          style={{
-            objectPosition: heroMobilePosition,
-            ["--hero-desktop-position" as string]: heroDesktopPosition,
-          }}
+          alt="Foto da nutricionista"
+          className="
+            h-full w-full object-cover
+            object-[40%_20%]
+            md:object-[60%_20%]
+          "
         />
         <div className="absolute inset-0 bg-black/40" />
       </div>
