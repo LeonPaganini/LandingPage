@@ -32,10 +32,8 @@ const Hero: React.FC = () => {
       <div className="relative mx-auto flex min-h-[520px] max-w-6xl flex-col items-center justify-center px-6 py-16 text-center">
         <GlassCard className="max-w-3xl border-white/60 px-8 py-10 text-left">
           <div className="flex flex-wrap items-center justify-between gap-4 text-white/90">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em]">Nutrição Feminina</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em]">Nutrição Acolhedora</p>
             <div className="flex gap-2 text-xs text-white/80">
-              <span className="inline-flex items-center gap-2 rounded-full bg-black/25 px-3 py-1">Glassmorphism</span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-black/25 px-3 py-1">Mobile-first</span>
             </div>
           </div>
           <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-4xl">
