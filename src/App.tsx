@@ -14,45 +14,53 @@ import BodyFatCalculator from "./Calculator";
 import ResetNutricionalPage from "./ResetNutricional.js";
 import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
 
-const Hero: React.FC = () => (
-  <section className="relative overflow-hidden bg-gradient-to-br from-primary-700/75 via-peach-500/70 to-surface-200/80 text-neutral-900">
-    <div
-      className="absolute inset-0"
-      style={{
-        backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0.35)), url(${hero.image})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        filter: "saturate(1)",
-      }}
-    />
-    <div className="relative mx-auto flex min-h-[520px] max-w-6xl flex-col items-center justify-center px-6 py-16 text-center">
-      <GlassCard className="max-w-3xl border-white/60 px-8 py-10 text-left">
-        <div className="flex flex-wrap items-center justify-between gap-4 text-white/90">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em]">Nutrição Feminina</p>
-          <div className="flex gap-2 text-xs text-white/80">
-            <span className="inline-flex items-center gap-2 rounded-full bg-black/25 px-3 py-1">Glassmorphism</span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-black/25 px-3 py-1">Mobile-first</span>
+const Hero: React.FC = () => {
+  const heroMobilePosition = hero.imagePositionMobile ?? "40% 20%";
+  const heroDesktopPosition = hero.imagePositionDesktop ?? "60% 20%";
+
+  return (
+    <section className="relative overflow-hidden bg-gradient-to-br from-primary-700/75 via-peach-500/70 to-surface-200/80 text-neutral-900">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <img
+          src={hero.image}
+          alt=""
+          className={`h-full w-full object-cover md:object-[var(--hero-desktop-position)]`}
+          style={{
+            objectPosition: heroMobilePosition,
+            ["--hero-desktop-position" as string]: heroDesktopPosition,
+          }}
+        />
+        <div className="absolute inset-0 bg-black/40" />
+      </div>
+      <div className="relative mx-auto flex min-h-[520px] max-w-6xl flex-col items-center justify-center px-6 py-16 text-center">
+        <GlassCard className="max-w-3xl border-white/60 px-8 py-10 text-left">
+          <div className="flex flex-wrap items-center justify-between gap-4 text-white/90">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em]">Nutrição Feminina</p>
+            <div className="flex gap-2 text-xs text-white/80">
+              <span className="inline-flex items-center gap-2 rounded-full bg-black/25 px-3 py-1">Glassmorphism</span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-black/25 px-3 py-1">Mobile-first</span>
+            </div>
           </div>
-        </div>
-        <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-4xl">
-          {hero.title}
-        </h1>
-        <p className="mt-4 text-lg text-white/90 md:text-xl">{hero.subtitle}</p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          {hero.badges.map((badge) => (
-            <Badge key={badge}>{badge}</Badge>
-          ))}
-        </div>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <CTAButton label={hero.ctaPrimary} />
-          <button className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10">
-            {hero.ctaSecondary}
-          </button>
-        </div>
-      </GlassCard>
-    </div>
-  </section>
-);
+          <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-4xl">
+            {hero.title}
+          </h1>
+          <p className="mt-4 text-lg text-white/90 md:text-xl">{hero.subtitle}</p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            {hero.badges.map((badge) => (
+              <Badge key={badge}>{badge}</Badge>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <CTAButton label={hero.ctaPrimary} />
+            <button className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10">
+              {hero.ctaSecondary}
+            </button>
+          </div>
+        </GlassCard>
+      </div>
+    </section>
+  );
+};
 
 const Diagnostic: React.FC = () => {
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
@@ -118,42 +126,48 @@ const Diagnostic: React.FC = () => {
   );
 };
 
-const About: React.FC = () => (
-  <SectionWave className="bg-white/70">
-    <div className="mx-auto max-w-6xl px-6">
-      <SectionTitle label={about.title} />
-      <div className="grid gap-8 md:grid-cols-2 md:items-center">
-        <GlassCard className="overflow-hidden">
-          <div
-            className="h-full min-h-[320px]"
-            style={{
-              backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25)), url(${about.image})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-        </GlassCard>
-        <GlassCard className="p-6 md:p-8">
-          <p className="card-text text-base">{about.text}</p>
-          <ul className="mt-4 space-y-3 text-sm font-semibold text-neutral-900">
-            {about.bullets.map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <span className="mt-1 text-primary-700">•</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <CTAButton label="Quero emagrecer de forma leve" />
-            <button className="rounded-full border border-neutral-900/10 px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40">
-              Quero saber mais
-            </button>
+const About: React.FC = () => {
+  const aboutMobilePosition = about.imagePositionMobile ?? "40% 40%";
+  const aboutDesktopPosition = about.imagePositionDesktop ?? "45% 35%";
+
+  return (
+    <SectionWave className="bg-white/70">
+      <div className="mx-auto max-w-6xl px-6">
+        <SectionTitle label={about.title} />
+        <div className="grid gap-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-center">
+          <div className="h-64 overflow-hidden rounded-3xl shadow-2xl md:h-80 lg:h-96">
+            <img
+              src={about.image}
+              alt=""
+              className={`h-full w-full object-cover md:object-[var(--about-desktop-position)]`}
+              style={{
+                objectPosition: aboutMobilePosition,
+                ["--about-desktop-position" as string]: aboutDesktopPosition,
+              }}
+            />
           </div>
-        </GlassCard>
+          <GlassCard className="p-6 md:p-8">
+            <p className="card-text text-base">{about.text}</p>
+            <ul className="mt-4 space-y-3 text-sm font-semibold text-neutral-900">
+              {about.bullets.map((item) => (
+                <li key={item} className="flex items-start gap-2">
+                  <span className="mt-1 text-primary-700">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <CTAButton label="Quero emagrecer de forma leve" />
+              <button className="rounded-full border border-neutral-900/10 px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40">
+                Quero saber mais
+              </button>
+            </div>
+          </GlassCard>
+        </div>
       </div>
-    </div>
-  </SectionWave>
-);
+    </SectionWave>
+  );
+};
 
 const Methods: React.FC<{ onNavigateToCalculator: () => void; onNavigateToReset: () => void }> = ({
   onNavigateToCalculator,
