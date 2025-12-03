@@ -24,6 +24,8 @@ export const hero = {
   badges: ["+1000 pessoas acompanhadas", "Planos 100% personalizados", "Equilíbrio, não restrição"],
   image:
     "https://i.ibb.co/qLwv9x86/nutri-hero.png",
+  imagePositionMobile: "40% 20%",
+  imagePositionDesktop: "60% 20%",
   ctaPrimary: "Quero saber mais",
   ctaSecondary: "Já decidi! Quero agendar!",
 };
@@ -55,6 +57,8 @@ export const about = {
     "Protocolos leves: você entende, melhora e se mantém bem sem sofrer",
   ],
   image: "https://i.ibb.co/QybyffJ/nutri-profile.jpg",
+  imagePositionMobile: "40% 40%",
+  imagePositionDesktop: "45% 35%",
 };
 
 export const programs = [
