@@ -1,17 +1,20 @@
 import logging
 import os
+from datetime import datetime
 from functools import lru_cache
 from typing import Optional
 
+from zoneinfo import ZoneInfo
 import gspread
 
 logger = logging.getLogger(__name__)
 
+SHEET_HEADERS = ["Nome", "Telefone", "Sexo", "Resultado", "DataHora", "Origem"]
+SAO_PAULO_TZ = ZoneInfo("America/Sao_Paulo")
+
 
 def _current_timestamp() -> str:
-    from datetime import datetime, timezone
-
-    return datetime.now(timezone.utc).astimezone().isoformat()
+    return datetime.now(SAO_PAULO_TZ).strftime("%d/%m/%Y %H:%M")
 
 
 class GoogleSheetsService:
@@ -21,6 +24,7 @@ class GoogleSheetsService:
         self.worksheet_title = worksheet_title
         self._client = None
         self._worksheet = None
+        self._header_checked = False
 
     def _get_client(self):
         if not self._client:
@@ -56,9 +60,30 @@ class GoogleSheetsService:
         self._worksheet = worksheet
         return worksheet
 
-    def append_lead(self, lead):
+    def _ensure_headers(self, worksheet):
+        if self._header_checked:
+            return
+
+        try:
+            existing_headers = worksheet.row_values(1)
+        except Exception as exc:  # noqa: BLE001
+            raise RuntimeError("Failed to read worksheet headers") from exc
+
+        normalized = existing_headers[: len(SHEET_HEADERS)]
+        if normalized != SHEET_HEADERS or len(existing_headers) != len(SHEET_HEADERS):
+            try:
+                worksheet.update("A1:F1", [SHEET_HEADERS])
+            except Exception as exc:  # noqa: BLE001
+                raise RuntimeError("Failed to set worksheet headers") from exc
+
+        self._header_checked = True
+
+    def append_lead(self, nome: str, telefone: str, sexo: str = "", resultado: str | float = "", origem: str = ""):
         worksheet = self._get_worksheet()
-        row = [lead.nome, lead.telefone, lead.sexo, lead.resultado, _current_timestamp()]
+        self._ensure_headers(worksheet)
+
+        resultado_value = "" if resultado in ("", None) else resultado
+        row = [nome, telefone, sexo, resultado_value, _current_timestamp(), origem]
         try:
             worksheet.append_row(row, value_input_option="USER_ENTERED")
         except Exception as exc:  # noqa: BLE001
