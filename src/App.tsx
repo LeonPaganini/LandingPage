@@ -480,7 +480,7 @@ const App: React.FC = () => {
             onClick={navigateHome}
             className="text-left font-semibold text-neutral-900 transition hover:text-primary-700"
           >
-            Thaís Paganini | Nutrição Feminina
+            Thais Paganini | Nutrição Acolhedora
           </button>
           <div className="flex items-center gap-3">
             <CTAButton label="Agendar consulta" />
