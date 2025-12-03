@@ -27,13 +27,48 @@ class LeadPayload(BaseModel):
     )
 
 
+class ResetLeadPayload(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    nome: str = Field(
+        ..., min_length=1, validation_alias=AliasChoices("nome", "name")
+    )
+    telefone: str = Field(
+        ..., min_length=1, validation_alias=AliasChoices("telefone", "phone")
+    )
+
+
 @router.post("/gordura-marinha")
 def create_lead(payload: LeadPayload):
     try:
         service = get_sheets_service()
-        service.append_lead(payload)
+        service.append_lead(
+            nome=payload.nome,
+            telefone=payload.telefone,
+            sexo=payload.sexo,
+            resultado=payload.resultado,
+            origem="Calculadora",
+        )
     except Exception as exc:  # noqa: BLE001
         logger.exception("Error saving lead")
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    return {"ok": True}
+
+
+@router.post("/reset-nutricional")
+def create_reset_lead(payload: ResetLeadPayload):
+    try:
+        service = get_sheets_service()
+        service.append_lead(
+            nome=payload.nome,
+            telefone=payload.telefone,
+            sexo="",
+            resultado="",
+            origem="Reset",
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Error saving reset lead")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     return {"ok": True}

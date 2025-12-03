@@ -1,5 +1,5 @@
 import React from "react";
-import { enviarLeadPrograma } from "./leadService.js";
+import { enviarLeadReset } from "./leadService.js";
 import { CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
 
 const benefitCards = [
@@ -31,10 +31,7 @@ const formatPhoneNumber = (digits: string) => {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
 };
 
-const validateLead = (
-  data: { nome: string; telefone: string; email: string },
-  touched: Set<keyof typeof data>,
-) => {
+const validateLead = (data: { nome: string; telefone: string }, touched: Set<keyof typeof data>) => {
   const errors: Partial<Record<keyof typeof data, string>> = {};
   const trimmedName = data.nome.trim();
 
@@ -51,19 +48,12 @@ const validateLead = (
     }
   }
 
-  if (touched.has("email")) {
-    const email = data.email.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Informe um e-mail válido.";
-    }
-  }
-
   return errors;
 };
 
 const ResetNutricionalPage: React.FC<{ onNavigateHome: () => void }> = ({ onNavigateHome }) => {
   const formRef = React.useRef<HTMLDivElement>(null);
-  const [formData, setFormData] = React.useState({ nome: "", telefone: "", email: "" });
+  const [formData, setFormData] = React.useState({ nome: "", telefone: "" });
   const [touched, setTouched] = React.useState<Set<keyof typeof formData>>(new Set());
   const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
@@ -90,7 +80,7 @@ const ResetNutricionalPage: React.FC<{ onNavigateHome: () => void }> = ({ onNavi
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const allTouched = new Set<keyof typeof formData>(["nome", "telefone", "email"]);
+    const allTouched = new Set<keyof typeof formData>(["nome", "telefone"]);
     setTouched(allTouched);
 
     const currentErrors = validateLead(formData, allTouched);
@@ -102,16 +92,14 @@ const ResetNutricionalPage: React.FC<{ onNavigateHome: () => void }> = ({ onNavi
     setStatus("loading");
     setErrorMessage(null);
 
-    const ok = await enviarLeadPrograma({
+    const ok = await enviarLeadReset({
       nome: formData.nome.trim(),
       telefone: formData.telefone,
-      email: formData.email.trim(),
-      origem: "Reset Nutricional - Grupo 21 dias",
     });
 
     if (ok) {
       setStatus("success");
-      setFormData({ nome: "", telefone: "", email: "" });
+      setFormData({ nome: "", telefone: "" });
       setTouched(new Set());
     } else {
       setStatus("error");
@@ -269,20 +257,6 @@ const ResetNutricionalPage: React.FC<{ onNavigateHome: () => void }> = ({ onNavi
                   autoComplete="tel"
                 />
                 {errors.telefone && <p className="text-xs font-semibold text-error">{errors.telefone}</p>}
-              </label>
-
-              <label className="flex flex-col gap-2 rounded-2xl bg-white/70 p-4 shadow">
-                <span className="text-sm font-semibold text-neutral-900">E-mail</span>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(event) => updateField("email", event.target.value)}
-                  onBlur={() => markTouched("email")}
-                  placeholder="voce@email.com"
-                  className="w-full rounded-xl border border-white/40 bg-white/80 px-4 py-3 text-base font-semibold text-neutral-900 shadow-inner outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/40"
-                  autoComplete="email"
-                />
-                {errors.email && <p className="text-xs font-semibold text-error">{errors.email}</p>}
               </label>
 
               {errorMessage && <p className="text-sm font-semibold text-error">{errorMessage}</p>}
