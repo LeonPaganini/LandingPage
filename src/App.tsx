@@ -23,8 +23,8 @@ const Hero: React.FC = () => {
           alt="Foto da nutricionista"
           className="
             h-full w-full object-cover
-            object-[40%_20%]
-            md:object-[60%_20%]
+            object-[30%_20%]
+            md:object-[70%_20%]
           "
         />
         <div className="absolute inset-0 bg-black/40" />
