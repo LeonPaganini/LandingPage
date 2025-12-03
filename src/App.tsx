@@ -180,7 +180,6 @@ const Methods: React.FC<{ onNavigateToCalculator: () => void; onNavigateToReset:
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <p className="card-title">{program.title}</p>
-                  <span className="badge-pill bg-white/60 text-[11px]">Glass</span>
                 </div>
                 <p className="card-text">{program.desc}</p>
                 <ul className="space-y-2 text-sm text-neutral-900">
