@@ -29,29 +29,31 @@ const Hero: React.FC = () => {
         />
         <div className="absolute inset-0 bg-black/40" />
       </div>
-      <div className="relative mx-auto flex min-h-[520px] max-w-6xl flex-col items-center justify-center px-6 py-16 text-center">
-        <GlassCard className="max-w-3xl border-white/60 px-8 py-10 text-left">
-          <div className="flex flex-wrap items-center justify-between gap-4 text-white/90">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em]">Nutrição Acolhedora</p>
-            <div className="flex gap-2 text-xs text-white/80">
+      <div className="relative mx-auto flex min-h-[520px] max-w-6xl flex-col items-center justify-center md:justify-start px-6 py-16">
+        <div className="relative z-10 mx-auto w-full max-w-2xl md:mx-0 md:ml-20">
+          <GlassCard className="w-full border-white/60 px-8 py-10 text-left">
+            <div className="flex flex-wrap items-center justify-between gap-4 text-white/90">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em]">Nutrição Acolhedora</p>
+              <div className="flex gap-2 text-xs text-white/80">
+              </div>
             </div>
-          </div>
-          <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-4xl">
-            {hero.title}
-          </h1>
-          <p className="mt-4 text-lg text-white/90 md:text-xl">{hero.subtitle}</p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            {hero.badges.map((badge) => (
-              <Badge key={badge}>{badge}</Badge>
-            ))}
-          </div>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <CTAButton label={hero.ctaPrimary} />
-            <button className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10">
-              {hero.ctaSecondary}
-            </button>
-          </div>
-        </GlassCard>
+            <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-4xl">
+              {hero.title}
+            </h1>
+            <p className="mt-4 text-lg text-white/90 md:text-xl">{hero.subtitle}</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {hero.badges.map((badge) => (
+                <Badge key={badge}>{badge}</Badge>
+              ))}
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <CTAButton label={hero.ctaPrimary} />
+              <button className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10">
+                {hero.ctaSecondary}
+              </button>
+            </div>
+          </GlassCard>
+        </div>
       </div>
     </section>
   );
