@@ -23,7 +23,7 @@ export const hero = {
     "Reduza inchaço, fadiga, ansiedade alimentar e o sobrepeso com planos guiados, humanos e feitos para pessoas reais — com rotinas reais.",
   badges: ["+1000 pessoas acompanhadas", "Planos 100% personalizados", "Equilíbrio, não restrição"],
   image:
-    "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1400&q=80",
+    "https://i.ibb.co/qLwv9x86/nutri-hero.png",
   ctaPrimary: "Quero saber mais",
   ctaSecondary: "Já decidi! Quero agendar!",
 };
@@ -54,7 +54,7 @@ export const about = {
     "Especialista em sintomas como inchaço, fadiga, compulsão e humor instável",
     "Protocolos leves: você entende, melhora e se mantém bem sem sofrer",
   ],
-  image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
+  image: "https://i.ibb.co/QybyffJ/nutri-profile.jpg",
 };
 
 export const programs = [
