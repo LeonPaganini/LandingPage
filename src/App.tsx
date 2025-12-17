@@ -425,6 +425,9 @@ const LandingContent: React.FC<{
   </>
 );
 
+const normalizePathname = (pathname: string) => pathname.replace(/\/$/, "") || "/";
+const isLegacyLinkBioPath = (pathname: string) => normalizePathname(pathname).endsWith("/link_bio");
+
 const App: React.FC = () => {
   type ActivePage = "home" | "calculator" | "reset-nutricional" | "link-bio";
 
@@ -432,20 +435,40 @@ const App: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("page") === "calculadora_gordura") return "calculator";
 
-    const pathname = window.location.pathname.replace(/\/$/, "");
-    if (pathname.endsWith("/reset-nutricional")) return "reset-nutricional";
-    if (pathname.endsWith("/link_bio")) return "link-bio";
+    const normalizedPathname = normalizePathname(window.location.pathname);
+    if (normalizedPathname.endsWith("/reset-nutricional")) return "reset-nutricional";
+    if (isLegacyLinkBioPath(normalizedPathname)) return "link-bio";
+    if (normalizedPathname.endsWith("/link-bio")) return "link-bio";
 
     return "home";
   }, []);
 
   const [activePage, setActivePage] = React.useState<ActivePage>(getActivePage);
 
+  const redirectLegacyLinkBio = React.useCallback(() => {
+    const normalizedPathname = normalizePathname(window.location.pathname);
+    if (!isLegacyLinkBioPath(normalizedPathname)) return false;
+
+    const url = new URL(window.location.href);
+    url.pathname = normalizedPathname.replace(/link_bio$/, "link-bio");
+    window.history.replaceState({}, "", url);
+    setActivePage("link-bio");
+    return true;
+  }, []);
+
   React.useEffect(() => {
-    const handlePopState = () => setActivePage(getActivePage());
+    if (!redirectLegacyLinkBio()) {
+      setActivePage(getActivePage());
+    }
+
+    const handlePopState = () => {
+      if (redirectLegacyLinkBio()) return;
+      setActivePage(getActivePage());
+    };
+
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [getActivePage]);
+  }, [getActivePage, redirectLegacyLinkBio]);
 
   const navigateToCalculator = React.useCallback(() => {
     const url = new URL(window.location.href);
@@ -468,7 +491,7 @@ const App: React.FC = () => {
   const navigateToLinkBio = React.useCallback(() => {
     const url = new URL(window.location.href);
     url.searchParams.delete("page");
-    url.pathname = "/link_bio";
+    url.pathname = "/link-bio";
     window.history.pushState({}, "", url);
     setActivePage("link-bio");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -496,7 +519,7 @@ const App: React.FC = () => {
         return;
       }
 
-      if (route === "/link_bio" || route === "link_bio") {
+      if (route === "/link-bio" || route === "link-bio" || route === "/link_bio" || route === "link_bio") {
         navigateToLinkBio();
         return;
       }
