@@ -14,6 +14,13 @@ import BodyFatCalculator from "./Calculator";
 import ResetNutricionalPage from "./ResetNutricional.js";
 import LinkBio from "./LinkBio.js";
 import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
+import {
+  RouteKey,
+  getRouteHref,
+  navigateToRoute,
+  normalizeAndResolveRoute,
+  resolveRouteFromString,
+} from "./lib/router.js";
 
 const Hero: React.FC = () => {
   return (
@@ -167,10 +174,12 @@ const About: React.FC = () => {
   );
 };
 
-const Methods: React.FC<{ onNavigateToCalculator: () => void; onNavigateToReset: () => void }> = ({
-  onNavigateToCalculator,
-  onNavigateToReset,
-}) => (
+const Methods: React.FC<{
+  onNavigateToCalculator: () => void;
+  onNavigateToReset: () => void;
+  calculatorHref: string;
+  resetHref: string;
+}> = ({ onNavigateToCalculator, onNavigateToReset, calculatorHref, resetHref }) => (
   <SectionWave className="bg-gradient-to-b from-peach-500/40 via-surface-100 to-white">
     <div className="mx-auto max-w-6xl px-6">
       <SectionTitle label="Métodos & Programas" />
@@ -196,13 +205,7 @@ const Methods: React.FC<{ onNavigateToCalculator: () => void; onNavigateToReset:
                 <div className="pt-2">
                   <CTAButton
                     label={program.cta}
-                    href={
-                      goToCalculator
-                        ? "?page=calculadora_gordura"
-                        : isReset
-                          ? "/reset-nutricional"
-                          : undefined
-                    }
+                    href={goToCalculator ? calculatorHref : isReset ? resetHref : undefined}
                     onClick={
                       goToCalculator
                         ? onNavigateToCalculator
@@ -411,12 +414,19 @@ const Footer: React.FC = () => (
 const LandingContent: React.FC<{
   onNavigateToCalculator: () => void;
   onNavigateToReset: () => void;
-}> = ({ onNavigateToCalculator, onNavigateToReset }) => (
+  calculatorHref: string;
+  resetHref: string;
+}> = ({ onNavigateToCalculator, onNavigateToReset, calculatorHref, resetHref }) => (
   <>
     <Hero />
     <Diagnostic />
     <About />
-    <Methods onNavigateToCalculator={onNavigateToCalculator} onNavigateToReset={onNavigateToReset} />
+    <Methods
+      onNavigateToCalculator={onNavigateToCalculator}
+      onNavigateToReset={onNavigateToReset}
+      calculatorHref={calculatorHref}
+      resetHref={resetHref}
+    />
     <Story />
     <Benefits />
     <Testimonials />
@@ -425,118 +435,73 @@ const LandingContent: React.FC<{
   </>
 );
 
-const normalizePathname = (pathname: string) => pathname.replace(/\/$/, "") || "/";
-const isLegacyLinkBioPath = (pathname: string) => normalizePathname(pathname).endsWith("/link_bio");
-
 const App: React.FC = () => {
-  type ActivePage = "home" | "calculator" | "reset-nutricional" | "link-bio";
+  const [activePage, setActivePage] = React.useState<RouteKey>(() => normalizeAndResolveRoute());
 
-  const getActivePage = React.useCallback((): ActivePage => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("page") === "calculadora_gordura") return "calculator";
-
-    const normalizedPathname = normalizePathname(window.location.pathname);
-    if (normalizedPathname.endsWith("/reset-nutricional")) return "reset-nutricional";
-    if (isLegacyLinkBioPath(normalizedPathname)) return "link-bio";
-    if (normalizedPathname.endsWith("/link-bio")) return "link-bio";
-
-    return "home";
-  }, []);
-
-  const [activePage, setActivePage] = React.useState<ActivePage>(getActivePage);
-
-  const redirectLegacyLinkBio = React.useCallback(() => {
-    const normalizedPathname = normalizePathname(window.location.pathname);
-    if (!isLegacyLinkBioPath(normalizedPathname)) return false;
-
-    const url = new URL(window.location.href);
-    url.pathname = normalizedPathname.replace(/link-bio$/, "link-bio");
-    window.history.replaceState({}, "", url);
-    setActivePage("link-bio");
-    return true;
+  const syncRouteFromLocation = React.useCallback(() => {
+    setActivePage(normalizeAndResolveRoute());
   }, []);
 
   React.useEffect(() => {
-    if (!redirectLegacyLinkBio()) {
-      setActivePage(getActivePage());
-    }
-
     const handlePopState = () => {
-      if (redirectLegacyLinkBio()) return;
-      setActivePage(getActivePage());
+      syncRouteFromLocation();
     };
+
+    syncRouteFromLocation();
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [getActivePage, redirectLegacyLinkBio]);
+  }, [syncRouteFromLocation]);
+
+  const routeHrefs = React.useMemo(
+    () => ({
+      calculator: getRouteHref("calculator"),
+      reset: getRouteHref("reset-nutricional"),
+    }),
+    [activePage],
+  );
 
   const navigateToCalculator = React.useCallback(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("page", "calculadora_gordura");
-    url.pathname = "/";
-    window.history.pushState({}, "", url);
+    navigateToRoute("calculator");
     setActivePage("calculator");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const navigateToReset = React.useCallback(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.delete("page");
-    url.pathname = "/reset-nutricional";
-    window.history.pushState({}, "", url);
+    navigateToRoute("reset-nutricional");
     setActivePage("reset-nutricional");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const navigateToLinkBio = React.useCallback(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.delete("page");
-    url.pathname = "/link-bio";
-    window.history.pushState({}, "", url);
+    navigateToRoute("link-bio");
     setActivePage("link-bio");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const navigateHome = React.useCallback(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.delete("page");
-    url.pathname = "/";
-    const normalized = `${url.pathname}${url.search}${url.hash}`;
-    window.history.pushState({}, "", normalized);
+    navigateToRoute("home");
     setActivePage("home");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const handleInternalRoute = React.useCallback(
     (route: string) => {
-      if (route === "calculator") {
-        navigateToCalculator();
-        return;
-      }
+      const targetRoute = resolveRouteFromString(route);
 
-      if (route === "/reset-nutricional" || route === "reset-nutricional") {
-        navigateToReset();
-        return;
+      switch (targetRoute) {
+        case "calculator":
+          navigateToCalculator();
+          return;
+        case "reset-nutricional":
+          navigateToReset();
+          return;
+        case "link-bio":
+          navigateToLinkBio();
+          return;
+        case "home":
+        default:
+          navigateHome();
+          return;
       }
-
-      if (route === "/link-bio" || route === "link-bio" || route === "/link-bio" || route === "link-bio") {
-        navigateToLinkBio();
-        return;
-      }
-
-      if (route === "/" || route === "home") {
-        navigateHome();
-        return;
-      }
-
-      const url = new URL(window.location.href);
-      url.pathname = route.startsWith("/") ? route : `/${route}`;
-      url.searchParams.delete("page");
-      window.history.pushState({}, "", url);
-      setActivePage(getActivePage());
-      window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    [getActivePage, navigateHome, navigateToCalculator, navigateToLinkBio, navigateToReset],
+    [navigateHome, navigateToCalculator, navigateToLinkBio, navigateToReset],
   );
 
   return (
@@ -552,7 +517,11 @@ const App: React.FC = () => {
           </button>
           <div className="flex items-center gap-3">
             <CTAButton label="Agendar consulta" />
-            <CTAButton label="Calcular agora" href="?page=calculadora_gordura" onClick={navigateToCalculator} />
+            <CTAButton
+              label="Calcular agora"
+              href={routeHrefs.calculator}
+              onClick={navigateToCalculator}
+            />
           </div>
         </div>
       </header>
@@ -564,7 +533,12 @@ const App: React.FC = () => {
         />
       )}
       {activePage === "home" && (
-        <LandingContent onNavigateToCalculator={navigateToCalculator} onNavigateToReset={navigateToReset} />
+        <LandingContent
+          onNavigateToCalculator={navigateToCalculator}
+          onNavigateToReset={navigateToReset}
+          calculatorHref={routeHrefs.calculator}
+          resetHref={routeHrefs.reset}
+        />
       )}
       {activePage === "reset-nutricional" && <ResetNutricionalPage onNavigateHome={navigateHome} />}
       <Footer />
