@@ -450,7 +450,7 @@ const App: React.FC = () => {
     if (!isLegacyLinkBioPath(normalizedPathname)) return false;
 
     const url = new URL(window.location.href);
-    url.pathname = normalizedPathname.replace(/link_bio$/, "link-bio");
+    url.pathname = normalizedPathname.replace(/link-bio$/, "link-bio");
     window.history.replaceState({}, "", url);
     setActivePage("link-bio");
     return true;
@@ -519,7 +519,7 @@ const App: React.FC = () => {
         return;
       }
 
-      if (route === "/link-bio" || route === "link-bio" || route === "/link_bio" || route === "link_bio") {
+      if (route === "/link-bio" || route === "link-bio" || route === "/link-bio" || route === "link-bio") {
         navigateToLinkBio();
         return;
       }

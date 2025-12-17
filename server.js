@@ -175,7 +175,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (req.method === "GET" && url.pathname === "/link_bio") {
+  if (req.method === "GET" && url.pathname === "/link-bio") {
     res.statusCode = 308;
     res.setHeader("Location", "/link-bio");
     res.end();
