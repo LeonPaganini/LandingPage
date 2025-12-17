@@ -1,0 +1,108 @@
+export type LinkBioActionType = "internal" | "external" | "whatsapp";
+
+export type LinkBioItem = {
+  label: string;
+  description?: string;
+  icon?: string;
+  action_type: LinkBioActionType;
+  route_or_url: string;
+  priority: number;
+  highlight?: boolean;
+  whatsappMessage?: string;
+};
+
+export type LinkBioSection = {
+  title: string;
+  items: LinkBioItem[];
+};
+
+export const LINK_BIO_PROFILE = {
+  name: "Nutri Thais Paganini",
+  subtitle: "Nutrição acolhedora, humana e possível",
+};
+
+export const LINK_BIO_HERO = {
+  photo:
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1000&q=80",
+  headline: "Viva leve, com orientação e acolhimento",
+  subheadline: "Escolha o melhor caminho para falar comigo ou acessar os programas.",
+  ctaLabel: "Falar comigo agora",
+};
+
+export const WHATSAPP_CONFIG = {
+  phone: "5599999999999", // TODO: Ajustar para o número oficial
+  default_message:
+    "Olá, Nutri Thais! Acabei de abrir seu link da bio e quero saber mais sobre os atendimentos.",
+};
+
+export const LINK_BIO_SECTIONS: LinkBioSection[] = [
+  {
+    title: "Serviços (rotas internas)",
+    items: [
+      {
+        label: "Calculadora de % de Gordura",
+        description: "Resultado rápido para saber o melhor caminho para você",
+        icon: "📊",
+        action_type: "internal",
+        route_or_url: "calculator",
+        priority: 1,
+        highlight: true,
+      },
+      {
+        label: "Reset Nutricional",
+        description: "Grupo sazonal de 21 dias para desinchar e regular o corpo",
+        icon: "✨",
+        action_type: "internal",
+        route_or_url: "/reset-nutricional",
+        priority: 2,
+      },
+    ],
+  },
+  {
+    title: "Grupos / Comunidade",
+    items: [
+      {
+        label: "Cadastro no Grupo de Acompanhamento",
+        description: "Entre para a lista e receba prioridade nas vagas",
+        icon: "🤝",
+        action_type: "external",
+        route_or_url: "https://example.com/grupo-cadastro", // TODO: Ajustar link oficial do grupo
+        priority: 1,
+      },
+    ],
+  },
+  {
+    title: "Contato",
+    items: [
+      {
+        label: "WhatsApp direto",
+        description: "Me chame com uma mensagem pronta",
+        icon: "💬",
+        action_type: "whatsapp",
+        route_or_url: "",
+        priority: 1,
+      },
+      {
+        label: "E-mail profissional",
+        description: "Envie um e-mail com seu objetivo",
+        icon: "✉️",
+        action_type: "external",
+        route_or_url: "mailto:contato@nutrithais.com", // TODO: Ajustar e-mail oficial se necessário
+        priority: 2,
+      },
+    ],
+  },
+  {
+    title: "Materiais / Ebooks / Conteúdos",
+    items: [
+      {
+        label: "Mini guia de desinchar",
+        description: "Receba um resumo com os passos para aliviar inchaço",
+        icon: "📘",
+        action_type: "external",
+        route_or_url: "https://example.com/guia-desinchar", // TODO: Ajustar link oficial do material
+        priority: 1,
+      },
+    ],
+  },
+];

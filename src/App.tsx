@@ -12,6 +12,7 @@ import {
 } from "./data/content";
 import BodyFatCalculator from "./Calculator";
 import ResetNutricionalPage from "./ResetNutricional.js";
+import LinkBio from "./LinkBio.js";
 import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
 
 const Hero: React.FC = () => {
@@ -424,26 +425,50 @@ const LandingContent: React.FC<{
   </>
 );
 
+const normalizePathname = (pathname: string) => pathname.replace(/\/$/, "") || "/";
+const isLegacyLinkBioPath = (pathname: string) => normalizePathname(pathname).endsWith("/link_bio");
+
 const App: React.FC = () => {
-  type ActivePage = "home" | "calculator" | "reset-nutricional";
+  type ActivePage = "home" | "calculator" | "reset-nutricional" | "link-bio";
 
   const getActivePage = React.useCallback((): ActivePage => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("page") === "calculadora_gordura") return "calculator";
 
-    const pathname = window.location.pathname.replace(/\/$/, "");
-    if (pathname.endsWith("/reset-nutricional")) return "reset-nutricional";
+    const normalizedPathname = normalizePathname(window.location.pathname);
+    if (normalizedPathname.endsWith("/reset-nutricional")) return "reset-nutricional";
+    if (isLegacyLinkBioPath(normalizedPathname)) return "link-bio";
+    if (normalizedPathname.endsWith("/link-bio")) return "link-bio";
 
     return "home";
   }, []);
 
   const [activePage, setActivePage] = React.useState<ActivePage>(getActivePage);
 
+  const redirectLegacyLinkBio = React.useCallback(() => {
+    const normalizedPathname = normalizePathname(window.location.pathname);
+    if (!isLegacyLinkBioPath(normalizedPathname)) return false;
+
+    const url = new URL(window.location.href);
+    url.pathname = normalizedPathname.replace(/link_bio$/, "link-bio");
+    window.history.replaceState({}, "", url);
+    setActivePage("link-bio");
+    return true;
+  }, []);
+
   React.useEffect(() => {
-    const handlePopState = () => setActivePage(getActivePage());
+    if (!redirectLegacyLinkBio()) {
+      setActivePage(getActivePage());
+    }
+
+    const handlePopState = () => {
+      if (redirectLegacyLinkBio()) return;
+      setActivePage(getActivePage());
+    };
+
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [getActivePage]);
+  }, [getActivePage, redirectLegacyLinkBio]);
 
   const navigateToCalculator = React.useCallback(() => {
     const url = new URL(window.location.href);
@@ -463,6 +488,15 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const navigateToLinkBio = React.useCallback(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("page");
+    url.pathname = "/link-bio";
+    window.history.pushState({}, "", url);
+    setActivePage("link-bio");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const navigateHome = React.useCallback(() => {
     const url = new URL(window.location.href);
     url.searchParams.delete("page");
@@ -472,6 +506,38 @@ const App: React.FC = () => {
     setActivePage("home");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
+  const handleInternalRoute = React.useCallback(
+    (route: string) => {
+      if (route === "calculator") {
+        navigateToCalculator();
+        return;
+      }
+
+      if (route === "/reset-nutricional" || route === "reset-nutricional") {
+        navigateToReset();
+        return;
+      }
+
+      if (route === "/link-bio" || route === "link-bio" || route === "/link_bio" || route === "link_bio") {
+        navigateToLinkBio();
+        return;
+      }
+
+      if (route === "/" || route === "home") {
+        navigateHome();
+        return;
+      }
+
+      const url = new URL(window.location.href);
+      url.pathname = route.startsWith("/") ? route : `/${route}`;
+      url.searchParams.delete("page");
+      window.history.pushState({}, "", url);
+      setActivePage(getActivePage());
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [getActivePage, navigateHome, navigateToCalculator, navigateToLinkBio, navigateToReset],
+  );
 
   return (
     <main className="min-h-screen bg-surface-100 text-neutral-900">
@@ -491,6 +557,12 @@ const App: React.FC = () => {
         </div>
       </header>
       {activePage === "calculator" && <BodyFatCalculator />}
+      {activePage === "link-bio" && (
+        <LinkBio
+          onNavigateHome={navigateHome}
+          onInternalRoute={handleInternalRoute}
+        />
+      )}
       {activePage === "home" && (
         <LandingContent onNavigateToCalculator={navigateToCalculator} onNavigateToReset={navigateToReset} />
       )}

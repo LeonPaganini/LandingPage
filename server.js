@@ -1,6 +1,7 @@
 import http from "node:http";
 import { URL } from "node:url";
-import { existsSync, readFileSync } from "node:fs";
+import { createReadStream, existsSync, readFileSync } from "node:fs";
+import { extname, join } from "node:path";
 import { google } from "googleapis";
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -9,6 +10,19 @@ const SHEET_RANGE = "Leads!A:D";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
 let sheetsClient;
+
+const STATIC_DIR = process.env.STATIC_DIR ?? "dist";
+const MIME_TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".ico": "image/x-icon",
+};
 
 const loadGoogleCredentials = () => {
   const possiblePaths = ["/etc/secrets/credentials.json", "./credentials.json"];
@@ -107,6 +121,27 @@ const validateLead = ({ nome, telefone, sexo, resultado }) => {
   return { errors, normalized: { nome: trimmedName, telefone, sexo: normalizedSexo, resultado: parsedResultado } };
 };
 
+const serveFile = (res, absolutePath) => {
+  if (!existsSync(absolutePath)) return false;
+
+  const ext = extname(absolutePath).toLowerCase();
+  const contentType = MIME_TYPES[ext] ?? "application/octet-stream";
+  res.statusCode = 200;
+  res.setHeader("Content-Type", contentType);
+  createReadStream(absolutePath).pipe(res);
+  return true;
+};
+
+const getIndexFallback = () => {
+  const distIndex = join(process.cwd(), STATIC_DIR, "index.html");
+  if (existsSync(distIndex)) return distIndex;
+
+  const rootIndex = join(process.cwd(), "index.html");
+  if (existsSync(rootIndex)) return rootIndex;
+
+  return null;
+};
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url ?? "", `http://${req.headers.host ?? "localhost"}`);
 
@@ -138,6 +173,26 @@ const server = http.createServer(async (req, res) => {
       sendJson(res, 500, { error: "Não foi possível registrar o lead." });
     }
     return;
+  }
+
+  if (req.method === "GET" && url.pathname === "/link_bio") {
+    res.statusCode = 308;
+    res.setHeader("Location", "/link-bio");
+    res.end();
+    return;
+  }
+
+  if (req.method === "GET") {
+    const staticCandidate = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
+    const staticPath = join(process.cwd(), STATIC_DIR, staticCandidate);
+
+    if (serveFile(res, staticPath)) return;
+
+    const fallbackIndex = getIndexFallback();
+    if (fallbackIndex) {
+      serveFile(res, fallbackIndex);
+      return;
+    }
   }
 
   sendJson(res, 404, { error: "Rota não encontrada." });
