@@ -22,8 +22,7 @@ export const LINK_BIO_PROFILE = {
 };
 
 export const LINK_BIO_HERO = {
-  photo:
-    "https://i.ibb.co/QybyffJ/nutri-profile.jpg",
+  photo: "https://i.ibb.co/TMpNWMJS/Signos-do-zod-aco-m-stico-neon-azul-fundo-de-tela-para-celular.png",
   headline: "Viva leve, com orientação e acolhimento",
   subheadline: "Escolha o melhor caminho para falar comigo ou acessar os programas.",
   ctaLabel: "Falar comigo agora",
