@@ -119,3 +119,76 @@ body {
   border-color: var(--primary-green-soft);
   color: var(--deep-forest);
 }
+
+/* Link Bio Hero */
+.linkbio-hero {
+  position: relative;
+  overflow: visible;
+}
+
+.linkbio-hero__bg {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(var(--peach-500-rgba), 0.3), transparent 28%),
+    radial-gradient(circle at 82% 8%, rgba(var(--primary-500-rgba), 0.22), transparent 32%),
+    radial-gradient(circle at 50% 88%, rgba(var(--blush-300-rgba), 0.35), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.82) 48%, rgba(241, 237, 232, 0.9) 100%);
+  filter: saturate(1.05);
+}
+
+.linkbio-hero__content {
+  gap: 1.5rem;
+}
+
+.hero-image-wrapper {
+  position: relative;
+  width: min(84%, 440px);
+  margin: 0 auto -78px;
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-image-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 8% 10% auto;
+  height: 62%;
+  background: radial-gradient(circle, rgba(var(--primary-500-rgba), 0.18), transparent 55%);
+  filter: blur(32px);
+  z-index: 1;
+}
+
+.hero-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 28px;
+  box-shadow: 0 22px 60px rgba(var(--olive-700-rgba), 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.4));
+  mask-image: linear-gradient(to bottom, rgba(255, 255, 255, 1) 68%, rgba(255, 255, 255, 0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(255, 255, 255, 1) 68%, rgba(255, 255, 255, 0) 100%);
+  z-index: 2;
+}
+
+.hero-glass {
+  margin-top: -82px;
+  padding-top: 6rem;
+  border-color: rgba(var(--primary-500-rgba), 0.18);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 20px 48px rgba(var(--olive-700-rgba), 0.24);
+  backdrop-filter: blur(18px);
+}
+
+@media (min-width: 768px) {
+  .hero-image-wrapper {
+    width: min(72%, 460px);
+    margin-bottom: -90px;
+  }
+
+  .hero-glass {
+    padding-top: 7rem;
+    margin-top: -96px;
+  }
+}
