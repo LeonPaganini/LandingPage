@@ -18,7 +18,7 @@ export type LinkBioSection = {
 
 export const LINK_BIO_PROFILE = {
   name: "Nutri Thais Paganini",
-  subtitle: "Nutrição acolhedora, humana e possível",
+  subtitle: "",
 };
 
 export const LINK_BIO_HERO = {
