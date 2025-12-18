@@ -89,38 +89,38 @@ const LinkBio: React.FC<{
         <div className="linkbio-hero__bg absolute inset-0 -z-10" aria-hidden />
 
         <div className="linkbio-hero__content mx-auto flex max-w-3xl flex-col items-center text-center">
-          <div className="hero-image-layer">
-            <div className="hero-image-wrapper">
-              <img
-                src={LINK_BIO_HERO.photo}
-                alt={LINK_BIO_PROFILE.name}
-                className="hero-image"
-                loading="lazy"
-              />
+          <div className="linkbio-hero__stack">
+            <div className="hero-image-layer">
+              <div className="hero-image-wrapper">
+                <img
+                  src={LINK_BIO_HERO.photo}
+                  alt={LINK_BIO_PROFILE.name}
+                  className="hero-image"
+                  loading="lazy"
+                />
+              </div>
             </div>
+
+            <GlassCard className="hero-glass w-full px-6 py-8 text-center text-neutral-900 md:text-left">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-700/80">
+                {LINK_BIO_PROFILE.subtitle}
+              </p>
+              <h1 className="mt-3 text-3xl font-bold leading-tight text-neutral-900 md:text-4xl">
+                {LINK_BIO_HERO.headline}
+              </h1>
+              <p className="mt-3 text-base text-neutral-700">{LINK_BIO_HERO.subheadline}</p>
+              <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
+                <CTAButton label={LINK_BIO_HERO.ctaLabel} href={heroCtaHref} />
+                <button
+                  type="button"
+                  onClick={onNavigateHome}
+                  className="rounded-full border border-primary-700/60 px-5 py-3 text-sm font-semibold text-primary-800 transition hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-primary-700/40"
+                >
+                  Voltar para página inicial
+                </button>
+              </div>
+            </GlassCard>
           </div>
-
-          <div className="hero-image-spacer" aria-hidden />
-
-          <GlassCard className="hero-glass w-full px-6 py-8 text-center text-neutral-900 md:text-left">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-700/80">
-              {LINK_BIO_PROFILE.subtitle}
-            </p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight text-neutral-900 md:text-4xl">
-              {LINK_BIO_HERO.headline}
-            </h1>
-            <p className="mt-3 text-base text-neutral-700">{LINK_BIO_HERO.subheadline}</p>
-            <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
-              <CTAButton label={LINK_BIO_HERO.ctaLabel} href={heroCtaHref} />
-              <button
-                type="button"
-                onClick={onNavigateHome}
-                className="rounded-full border border-primary-700/60 px-5 py-3 text-sm font-semibold text-primary-800 transition hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-primary-700/40"
-              >
-                Voltar para página inicial
-              </button>
-            </div>
-          </GlassCard>
         </div>
       </section>
 
