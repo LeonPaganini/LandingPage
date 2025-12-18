@@ -52,9 +52,19 @@ const LinkBioCard: React.FC<{
     >
       <IconCircle icon={item.icon} />
       <div className="flex-1">
-        <p className="text-base font-semibold text-neutral-900">{item.label}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-base font-semibold text-neutral-900">{item.label}</p>
+          {item.badge && (
+            <span className="rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-primary-800">
+              {item.badge}
+            </span>
+          )}
+        </div>
         {item.description && (
           <p className="text-sm text-neutral-700">{item.description}</p>
+        )}
+        {item.ctaLabel && (
+          <p className="mt-1 text-sm font-semibold text-primary-700">{item.ctaLabel}</p>
         )}
       </div>
       <span className="text-lg text-primary-700" aria-hidden>
