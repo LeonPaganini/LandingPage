@@ -136,16 +136,25 @@ body {
 }
 
 .linkbio-hero__content {
-  gap: 1.5rem;
+  position: relative;
+  gap: 0;
+}
+
+.hero-image-layer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+  transform: translateY(10px);
 }
 
 .hero-image-wrapper {
   position: relative;
   width: clamp(220px, 78vw, 260px);
-  margin: 0 auto -96px;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
-  z-index: 2;
   pointer-events: none;
 }
 
@@ -169,14 +178,32 @@ body {
     0 18px 48px rgba(var(--olive-700-rgba), 0.24),
     0 0 0 12px rgba(var(--primary-500-rgba), 0.06);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.38));
-  mask-image: radial-gradient(circle at 50% 62%, rgba(255, 255, 255, 1) 62%, rgba(255, 255, 255, 0.95) 72%, rgba(255, 255, 255, 0) 94%);
-  -webkit-mask-image: radial-gradient(circle at 50% 62%, rgba(255, 255, 255, 1) 62%, rgba(255, 255, 255, 0.95) 72%, rgba(255, 255, 255, 0) 94%);
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 74%,
+    rgba(255, 255, 255, 0.92) 82%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 74%,
+    rgba(255, 255, 255, 0.92) 82%,
+    rgba(255, 255, 255, 0) 100%
+  );
   z-index: 2;
 }
 
+.hero-image-spacer {
+  height: clamp(2.25rem, 6vw, 3.5rem);
+  width: 100%;
+}
+
 .hero-glass {
-  margin-top: -92px;
-  padding-top: 6.5rem;
+  position: relative;
+  z-index: 1;
+  padding-top: clamp(6.5rem, 8vw, 7.75rem);
   border-color: rgba(var(--primary-500-rgba), 0.18);
   background: rgba(255, 255, 255, 0.58);
   box-shadow: 0 20px 48px rgba(var(--olive-700-rgba), 0.24);
@@ -184,13 +211,19 @@ body {
 }
 
 @media (min-width: 768px) {
+  .hero-image-layer {
+    transform: translateY(16px);
+  }
+
   .hero-image-wrapper {
     width: clamp(240px, 42vw, 320px);
-    margin-bottom: -110px;
+  }
+
+  .hero-image-spacer {
+    height: clamp(2.5rem, 4vw, 4rem);
   }
 
   .hero-glass {
-    padding-top: 7.5rem;
-    margin-top: -110px;
+    padding-top: clamp(7.25rem, 6vw, 8rem);
   }
 }

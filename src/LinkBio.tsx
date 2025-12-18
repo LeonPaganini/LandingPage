@@ -89,14 +89,18 @@ const LinkBio: React.FC<{
         <div className="linkbio-hero__bg absolute inset-0 -z-10" aria-hidden />
 
         <div className="linkbio-hero__content mx-auto flex max-w-3xl flex-col items-center text-center">
-          <div className="hero-image-wrapper">
-            <img
-              src={LINK_BIO_HERO.photo}
-              alt={LINK_BIO_PROFILE.name}
-              className="hero-image"
-              loading="lazy"
-            />
+          <div className="hero-image-layer">
+            <div className="hero-image-wrapper">
+              <img
+                src={LINK_BIO_HERO.photo}
+                alt={LINK_BIO_PROFILE.name}
+                className="hero-image"
+                loading="lazy"
+              />
+            </div>
           </div>
+
+          <div className="hero-image-spacer" aria-hidden />
 
           <GlassCard className="hero-glass w-full px-6 py-8 text-center text-neutral-900 md:text-left">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-700/80">
