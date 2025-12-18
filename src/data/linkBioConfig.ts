@@ -23,14 +23,14 @@ export const LINK_BIO_PROFILE = {
 
 export const LINK_BIO_HERO = {
   photo:
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1000&q=80",
+    "https://i.ibb.co/QybyffJ/nutri-profile.jpg",
   headline: "Viva leve, com orientação e acolhimento",
   subheadline: "Escolha o melhor caminho para falar comigo ou acessar os programas.",
   ctaLabel: "Falar comigo agora",
 };
 
 export const WHATSAPP_CONFIG = {
-  phone: "5599999999999", // TODO: Ajustar para o número oficial
+  phone: "21990189004", // TODO: Ajustar para o número oficial
   default_message:
     "Olá, Nutri Thais! Acabei de abrir seu link da bio e quero saber mais sobre os atendimentos.",
 };
@@ -44,7 +44,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         description: "Resultado rápido para saber o melhor caminho para você",
         icon: "📊",
         action_type: "internal",
-        route_or_url: "calculator",
+        route_or_url: "https://thaispaganini.onrender.com/?page=calculadora_gordura",
         priority: 1,
         highlight: true,
       },
@@ -53,7 +53,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         description: "Grupo sazonal de 21 dias para desinchar e regular o corpo",
         icon: "✨",
         action_type: "internal",
-        route_or_url: "/reset-nutricional",
+        route_or_url: "https://thaispaganini.onrender.com/?page=reset-nutricional",
         priority: 2,
       },
     ],
@@ -87,7 +87,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         description: "Envie um e-mail com seu objetivo",
         icon: "✉️",
         action_type: "external",
-        route_or_url: "mailto:contato@nutrithais.com", // TODO: Ajustar e-mail oficial se necessário
+        route_or_url: "mailto:equipe.nutripaganini@gmail.com", // TODO: Ajustar e-mail oficial se necessário
         priority: 2,
       },
     ],
