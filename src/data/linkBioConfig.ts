@@ -9,6 +9,8 @@ export type LinkBioItem = {
   priority: number;
   highlight?: boolean;
   whatsappMessage?: string;
+  badge?: string;
+  ctaLabel?: string;
 };
 
 export type LinkBioSection = {
@@ -35,18 +37,50 @@ export const WHATSAPP_CONFIG = {
     "Olá, Nutri Thais! Acabei de abrir seu link da bio e quero saber mais sobre os atendimentos.",
 };
 
+export const APP_NUTRI_CONFIG = {
+  label: "AppNutri",
+  description: "Plano alimentar inteligente com relatórios e insights personalizados.",
+  url: "https://appnutri.exemplo.com", // TODO: Ajustar para a URL oficial do AppNutri
+  ctaLabel: "Acessar AppNutri",
+  badge: "Digital",
+};
+
 export const LINK_BIO_SECTIONS: LinkBioSection[] = [
   {
     title: "Serviços para Você",
     items: [
+      {
+        label: "Atendimento com a Nutri",
+        description: "Fale comigo para definir o acompanhamento ideal",
+        icon: "💬",
+        action_type: "whatsapp",
+        route_or_url: "",
+        priority: 1,
+        highlight: true,
+        whatsappMessage:
+          "Olá, Nutri Thais! Quero falar sobre o acompanhamento individual.",
+        ctaLabel: "Falar comigo",
+      },
+      {
+        label: APP_NUTRI_CONFIG.label,
+        description: APP_NUTRI_CONFIG.description,
+        icon: "📱",
+        action_type: "external",
+        route_or_url: APP_NUTRI_CONFIG.url,
+        priority: 2,
+        highlight: true,
+        badge: APP_NUTRI_CONFIG.badge,
+        ctaLabel: APP_NUTRI_CONFIG.ctaLabel,
+      },
       {
         label: "Calculadora de % de Gordura",
         description: "Resultado rápido para saber o melhor caminho para você",
         icon: "📊",
         action_type: "internal",
         route_or_url: "https://thaispaganini.onrender.com/?page=calculadora_gordura",
-        priority: 1,
+        priority: 3,
         highlight: true,
+        ctaLabel: "Usar calculadora",
       },
       {
         label: "Reset Nutricional",
@@ -54,7 +88,8 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         icon: "✨",
         action_type: "internal",
         route_or_url: "https://thaispaganini.onrender.com/?page=reset-nutricional",
-        priority: 2,
+        priority: 4,
+        ctaLabel: "Entrar no programa",
       },
     ],
   },
