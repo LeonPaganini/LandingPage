@@ -117,7 +117,6 @@ const LinkBio: React.FC<{
 
       <section className="mx-auto flex max-w-xl flex-col gap-6 px-5 pb-16">
         <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-700">Link da Bio</p>
           <h2 className="mt-2 text-2xl font-bold text-neutral-900 md:text-3xl">{LINK_BIO_PROFILE.name}</h2>
           <p className="mt-1 text-base text-neutral-700">{LINK_BIO_PROFILE.subtitle}</p>
         </div>
