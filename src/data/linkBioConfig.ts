@@ -37,7 +37,7 @@ export const WHATSAPP_CONFIG = {
 
 export const LINK_BIO_SECTIONS: LinkBioSection[] = [
   {
-    title: "Serviços (rotas internas)",
+    title: "Serviços para Você",
     items: [
       {
         label: "Calculadora de % de Gordura",
