@@ -267,11 +267,8 @@ body {
   width: min(100%, 420px);
 }
 
-.home-hero__desktop-frame {
-  display: none;
-}
-
 .home-hero__img {
+  display: none;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -313,22 +310,19 @@ body {
     display: none;
   }
 
-  .home-hero__desktop-frame {
-    display: block;
-    position: relative;
-    width: 100%;
-    max-width: 560px;
-    min-height: 520px;
-    overflow: hidden;
-    border-radius: 32px;
-    box-shadow: 0 26px 58px rgba(var(--olive-700-rgba), 0.26);
-  }
-
   .home-hero__bg-img {
     object-position: 18% 20%;
   }
 
   .home-hero__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 560px;
+    min-height: 520px;
+    border-radius: 32px;
+    box-shadow: 0 26px 58px rgba(var(--olive-700-rgba), 0.26);
+    object-fit: cover;
     object-position: 75% center;
   }
 }

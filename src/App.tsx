@@ -51,14 +51,12 @@ const Hero: React.FC = () => {
             </div>
           </div>
 
-          <div className="home-hero__desktop-frame">
-            <img
-              src={hero.image}
-              alt="Foto da nutricionista"
-              className="home-hero__img"
-              loading="lazy"
-            />
-          </div>
+          <img
+            src={hero.image}
+            alt="Foto da nutricionista"
+            className="home-hero__img"
+            loading="lazy"
+          />
         </div>
 
         <div className="home-hero__content">
