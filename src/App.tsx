@@ -21,29 +21,51 @@ import {
   normalizeAndResolveRoute,
   resolveRouteFromString,
 } from "./lib/router.js";
+import { LINK_BIO_HERO, LINK_BIO_PROFILE } from "./data/linkBioConfig";
 
 const Hero: React.FC = () => {
   return (
-    <section className="relative isolate overflow-hidden bg-bgBase pt-20 pb-16 md:pt-24 md:pb-24">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
+    <section className="home-hero relative isolate overflow-hidden bg-bgBase px-6 pt-20 pb-16 md:pt-24 md:pb-24">
+      <div className="home-hero__bg absolute inset-0 -z-10 overflow-hidden">
         <img
           src={hero.image}
-          alt="Foto da nutricionista"
-          className="
-            h-full w-full object-cover
-            object-[30%_20%]
-            md:object-[70%_20%]
-          "
+          alt=""
+          className="home-hero__bg-img"
+          loading="lazy"
+          aria-hidden
         />
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="home-hero__bg-overlay" />
       </div>
-      <div className="relative mx-auto flex min-h-[520px] max-w-6xl flex-col items-center justify-center md:justify-start px-6 py-16">
-        <div className="relative z-10 mx-auto w-full max-w-2xl md:mx-0 md:ml-20">
-          <GlassCard className="w-full border-white/60 px-8 py-10 text-left">
+      <div className="home-hero__grid relative mx-auto max-w-6xl">
+        <div className="home-hero__media">
+          <div className="home-hero__mobile-portrait">
+            <div className="hero-image-layer">
+              <div className="hero-image-wrapper">
+                <img
+                  src={LINK_BIO_HERO.photo}
+                  alt={LINK_BIO_PROFILE.name}
+                  className="hero-image"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="home-hero__desktop-frame">
+            <img
+              src={hero.image}
+              alt="Foto da nutricionista"
+              className="home-hero__img"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+        <div className="home-hero__content">
+          <GlassCard className="home-hero__card w-full border-white/60 px-8 py-10 text-left">
             <div className="flex flex-wrap items-center justify-between gap-4 text-white/90">
               <p className="text-sm font-semibold uppercase tracking-[0.2em]">Nutrição Acolhedora</p>
-              <div className="flex gap-2 text-xs text-white/80">
-              </div>
+              <div className="flex gap-2 text-xs text-white/80" />
             </div>
             <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-4xl">
               {hero.title}
