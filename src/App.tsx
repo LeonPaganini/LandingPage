@@ -37,7 +37,6 @@ const Hero: React.FC = () => {
         <div className="home-hero__bg-overlay" />
       </div>
       <div className="home-hero__grid relative mx-auto max-w-6xl">
-        <div className="home-hero__media">
           <div className="home-hero__mobile-portrait">
             <div className="hero-image-layer">
               <div className="hero-image-wrapper">
