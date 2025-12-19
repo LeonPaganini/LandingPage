@@ -50,14 +50,6 @@ const Hero: React.FC = () => {
             </div>
           </div>
 
-          <img
-            src={hero.image}
-            alt="Foto da nutricionista"
-            className="home-hero__img"
-            loading="lazy"
-          />
-        </div>
-
         <div className="home-hero__content">
           <GlassCard className="home-hero__card w-full border-white/60 px-8 py-10 text-left">
             <div className="flex flex-wrap items-center justify-between gap-4 text-white/90">
