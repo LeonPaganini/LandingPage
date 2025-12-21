@@ -144,7 +144,7 @@ const Diagnostic: React.FC = () => {
 
 const About: React.FC = () => {
   const aboutMobilePosition = about.imagePositionMobile ?? "50% 50%";
-  const aboutDesktopPosition = about.imagePositionDesktop ?? "50% 48%";
+  const aboutDesktopPosition = about.imagePositionDesktop ?? "50% 10%";
 
   return (
     <SectionWave className="bg-white/70">
@@ -155,7 +155,7 @@ const About: React.FC = () => {
             <img
               src={about.image}
               alt=""
-              className={`h-full w-full scale-[0.98] object-cover md:scale-[0.97] md:object-[var(--about-desktop-position)]`}
+              className={`h-full w-full object-cover md:object-[var(--about-desktop-position)]`}
               style={{
                 objectPosition: aboutMobilePosition,
                 ["--about-desktop-position" as string]: aboutDesktopPosition,

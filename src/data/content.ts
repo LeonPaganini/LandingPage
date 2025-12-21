@@ -58,7 +58,7 @@ export const about = {
   ],
   image: "https://i.ibb.co/mV1qpwwq/Signos-do-zod-aco-m-stico-neon-azul-fundo-de-tela-para-celular-2.png",
   imagePositionMobile: "50% 50%",
-  imagePositionDesktop: "50% 48%",
+  imagePositionDesktop: "50% 10%",
 };
 
 export const programs = [

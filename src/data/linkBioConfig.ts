@@ -87,7 +87,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
       },
       {
         label: "Calculadora de % de Gordura",
-        description: "Resultado rápido para saber o melhor caminho para você",
+        description: "Calcule seu percentual de gordura corporal",
         icon: "📊",
         action_type: "internal",
         route_or_url: "https://thaispaganini.onrender.com/?page=calculadora_gordura",
