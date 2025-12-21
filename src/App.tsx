@@ -143,7 +143,7 @@ const Diagnostic: React.FC = () => {
 };
 
 const About: React.FC = () => {
-  const aboutMobilePosition = about.imagePositionMobile ?? "50% 50%";
+  const aboutMobilePosition = about.imagePositionMobile ?? "50% 10%";
   const aboutDesktopPosition = about.imagePositionDesktop ?? "50% 10%";
 
   return (
