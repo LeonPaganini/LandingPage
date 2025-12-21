@@ -138,7 +138,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         description: "Receba um resumo com os passos para aliviar inchaço",
         icon: "📘",
         action_type: "external",
-        route_or_url: "https://example.com/guia-desinchar", // TODO: Ajustar link oficial do material
+        route_or_url: "", // TODO: Ajustar link oficial do material
         priority: 1,
       },
     ],
