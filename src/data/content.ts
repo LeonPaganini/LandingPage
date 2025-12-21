@@ -56,7 +56,7 @@ export const about = {
     "Especialista em sintomas como inchaço, fadiga, compulsão e humor instável",
     "Protocolos leves: você entende, melhora e se mantém bem sem sofrer",
   ],
-  image: "https://i.ibb.co/QybyffJ/nutri-profile.jpg",
+  image: "https://i.ibb.co/mV1qpwwq/Signos-do-zod-aco-m-stico-neon-azul-fundo-de-tela-para-celular-2.png",
   imagePositionMobile: "40% 40%",
   imagePositionDesktop: "45% 35%",
 };
