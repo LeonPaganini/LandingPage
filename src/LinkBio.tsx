@@ -5,14 +5,8 @@ import {
   LINK_BIO_PROFILE,
   LINK_BIO_SECTIONS,
   LinkBioItem,
-  WHATSAPP_CONFIG,
 } from "./data/linkBioConfig";
-
-const buildWhatsappUrl = (message?: string) => {
-  const phone = WHATSAPP_CONFIG.phone.replace(/\D/g, "");
-  const text = encodeURIComponent(message || WHATSAPP_CONFIG.default_message);
-  return `https://api.whatsapp.com/send?phone=${phone}&text=${text}`;
-};
+import { buildWhatsappUrl } from "./config/whatsapp";
 
 const IconCircle: React.FC<{ icon?: string }> = ({ icon }) => (
   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/70 text-lg text-primary-700 shadow-inner">

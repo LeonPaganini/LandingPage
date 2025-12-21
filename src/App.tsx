@@ -22,8 +22,16 @@ import {
   resolveRouteFromString,
 } from "./lib/router.js";
 import { LINK_BIO_HERO, LINK_BIO_PROFILE } from "./data/linkBioConfig";
+import {
+  getWhatsappHrefForCta,
+  hasWhatsappMessageForCta,
+  openWhatsappForCta,
+} from "./lib/whatsapp.js";
 
-const Hero: React.FC = () => {
+const Hero: React.FC<{
+  onWhatsappClick: (label: string) => void;
+  getWhatsappHref: (label: string) => string;
+}> = ({ onWhatsappClick, getWhatsappHref }) => {
   return (
     <section className="home-hero relative isolate overflow-hidden bg-bgBase px-6 pt-20 pb-16 md:pt-24 md:pb-24">
       <div className="home-hero__bg absolute inset-0 -z-10 overflow-hidden">
@@ -66,8 +74,11 @@ const Hero: React.FC = () => {
               ))}
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              <CTAButton label={hero.ctaPrimary} />
-              <button className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10">
+              <CTAButton label={hero.ctaPrimary} href={getWhatsappHref(hero.ctaPrimary)} />
+              <button
+                className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10"
+                onClick={() => onWhatsappClick(hero.ctaSecondary)}
+              >
                 {hero.ctaSecondary}
               </button>
             </div>
@@ -142,7 +153,9 @@ const Diagnostic: React.FC = () => {
   );
 };
 
-const About: React.FC = () => {
+const About: React.FC<{
+  onWhatsappClick: (label: string) => void;
+}> = ({ onWhatsappClick }) => {
   const aboutMobilePosition = about.imagePositionMobile ?? "50% 10%";
   const aboutDesktopPosition = about.imagePositionDesktop ?? "50% 10%";
 
@@ -173,8 +186,14 @@ const About: React.FC = () => {
               ))}
             </ul>
             <div className="mt-6 flex flex-wrap gap-3">
-              <CTAButton label="Quero emagrecer de forma leve" />
-              <button className="rounded-full border border-neutral-900/10 px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40">
+              <CTAButton
+                label="Quero emagrecer de forma leve"
+                onClick={() => onWhatsappClick("Quero emagrecer de forma leve")}
+              />
+              <button
+                className="rounded-full border border-neutral-900/10 px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40"
+                onClick={() => onWhatsappClick("Quero saber mais")}
+              >
                 Quero saber mais
               </button>
             </div>
@@ -190,7 +209,18 @@ const Methods: React.FC<{
   onNavigateToReset: () => void;
   calculatorHref: string;
   resetHref: string;
-}> = ({ onNavigateToCalculator, onNavigateToReset, calculatorHref, resetHref }) => (
+  onWhatsappClick: (label: string) => void;
+  isWhatsappCta: (label: string) => boolean;
+  getWhatsappHref: (label: string) => string;
+}> = ({
+  onNavigateToCalculator,
+  onNavigateToReset,
+  calculatorHref,
+  resetHref,
+  onWhatsappClick,
+  isWhatsappCta,
+  getWhatsappHref,
+}) => (
   <SectionWave className="bg-gradient-to-b from-peach-500/40 via-surface-100 to-white">
     <div className="mx-auto max-w-6xl px-6">
       <SectionTitle label="Métodos & Programas" />
@@ -198,6 +228,8 @@ const Methods: React.FC<{
         {programs.map((program) => {
           const goToCalculator = program.cta.toLowerCase().includes("calcular");
           const isReset = program.title.toLowerCase().includes("reset nutricional");
+          const isWhatsapp = isWhatsappCta(program.cta);
+          const whatsappHref = getWhatsappHref(program.cta);
           return (
             <GlassCard key={program.title} className="p-6 transition hover:-translate-y-1">
               <div className="flex flex-col gap-3">
@@ -216,13 +248,23 @@ const Methods: React.FC<{
                 <div className="pt-2">
                   <CTAButton
                     label={program.cta}
-                    href={goToCalculator ? calculatorHref : isReset ? resetHref : undefined}
+                    href={
+                      isWhatsapp
+                        ? whatsappHref
+                        : goToCalculator
+                          ? calculatorHref
+                          : isReset
+                            ? resetHref
+                            : undefined
+                    }
                     onClick={
-                      goToCalculator
-                        ? onNavigateToCalculator
-                        : isReset
-                          ? onNavigateToReset
-                          : undefined
+                      isWhatsapp
+                        ? () => onWhatsappClick(program.cta)
+                        : goToCalculator
+                          ? onNavigateToCalculator
+                          : isReset
+                            ? onNavigateToReset
+                            : undefined
                     }
                   />
                 </div>
@@ -235,7 +277,7 @@ const Methods: React.FC<{
   </SectionWave>
 );
 
-const Story: React.FC = () => (
+const Story: React.FC<{ onWhatsappClick: (label: string) => void }> = ({ onWhatsappClick }) => (
   <SectionWave className="bg-blush-300/20">
     <div className="mx-auto max-w-5xl px-6">
       <GlassCard className="p-6 md:p-10 text-center">
@@ -250,7 +292,7 @@ const Story: React.FC = () => (
         </div>
         <p className="mt-6 text-base text-neutral-600">{story.text}</p>
         <div className="mt-8 flex justify-center">
-          <CTAButton label="Quero viver isso" />
+          <CTAButton label="Quero viver isso" onClick={() => onWhatsappClick("Quero viver isso")} />
         </div>
       </GlassCard>
     </div>
@@ -382,7 +424,7 @@ const FAQ: React.FC = () => {
   );
 };
 
-const FinalCTA: React.FC = () => (
+const FinalCTA: React.FC<{ onWhatsappClick: (label: string) => void }> = ({ onWhatsappClick }) => (
   <section className="relative overflow-hidden bg-gradient-to-br from-primary-700/70 via-peach-500/60 to-blush-300/60 text-white">
     <div
       className="absolute inset-0"
@@ -398,8 +440,14 @@ const FinalCTA: React.FC = () => (
         <h2 className="text-3xl font-bold">Pronta para leveza?</h2>
         <p className="mt-4 text-lg text-white/90">Agende agora e receba seu plano guiado.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <CTAButton label="Chamar Thaís agora" />
-          <button className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10">
+          <CTAButton
+            label="Chamar Thaís agora"
+            onClick={() => onWhatsappClick("Chamar Thaís agora")}
+          />
+          <button
+            className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10"
+            onClick={() => onWhatsappClick("Ver disponibilidade")}
+          >
             Ver disponibilidade
           </button>
         </div>
@@ -427,22 +475,36 @@ const LandingContent: React.FC<{
   onNavigateToReset: () => void;
   calculatorHref: string;
   resetHref: string;
-}> = ({ onNavigateToCalculator, onNavigateToReset, calculatorHref, resetHref }) => (
+  onWhatsappClick: (label: string) => void;
+  isWhatsappCta: (label: string) => boolean;
+  getWhatsappHref: (label: string) => string;
+}> = ({
+  onNavigateToCalculator,
+  onNavigateToReset,
+  calculatorHref,
+  resetHref,
+  onWhatsappClick,
+  isWhatsappCta,
+  getWhatsappHref,
+}) => (
   <>
-    <Hero />
+    <Hero onWhatsappClick={onWhatsappClick} getWhatsappHref={getWhatsappHref} />
     <Diagnostic />
-    <About />
+    <About onWhatsappClick={onWhatsappClick} />
     <Methods
       onNavigateToCalculator={onNavigateToCalculator}
       onNavigateToReset={onNavigateToReset}
       calculatorHref={calculatorHref}
       resetHref={resetHref}
+      onWhatsappClick={onWhatsappClick}
+      isWhatsappCta={isWhatsappCta}
+      getWhatsappHref={getWhatsappHref}
     />
-    <Story />
+    <Story onWhatsappClick={onWhatsappClick} />
     <Benefits />
     <Testimonials />
     <FAQ />
-    <FinalCTA />
+    <FinalCTA onWhatsappClick={onWhatsappClick} />
   </>
 );
 
@@ -492,6 +554,21 @@ const App: React.FC = () => {
     setActivePage("home");
   }, []);
 
+  const getWhatsappHref = React.useCallback(
+    (label: string) => getWhatsappHrefForCta(label, activePage),
+    [activePage],
+  );
+
+  const handleWhatsappClick = React.useCallback(
+    (label: string) => openWhatsappForCta(label, activePage),
+    [activePage],
+  );
+
+  const isWhatsappCta = React.useCallback(
+    (label: string) => hasWhatsappMessageForCta(label, activePage),
+    [activePage],
+  );
+
   const handleInternalRoute = React.useCallback(
     (route: string) => {
       const targetRoute = resolveRouteFromString(route);
@@ -527,7 +604,11 @@ const App: React.FC = () => {
             Thais Paganini | Nutrição Acolhedora
           </button>
           <div className="flex items-center gap-3">
-            <CTAButton label="Agendar consulta" />
+            <CTAButton
+              label="Agendar consulta"
+              href={getWhatsappHref("Agendar consulta")}
+              onClick={() => handleWhatsappClick("Agendar consulta")}
+            />
             <CTAButton
               label="Calcular agora"
               href={routeHrefs.calculator}
@@ -549,6 +630,9 @@ const App: React.FC = () => {
           onNavigateToReset={navigateToReset}
           calculatorHref={routeHrefs.calculator}
           resetHref={routeHrefs.reset}
+          onWhatsappClick={handleWhatsappClick}
+          isWhatsappCta={isWhatsappCta}
+          getWhatsappHref={getWhatsappHref}
         />
       )}
       {activePage === "reset-nutricional" && <ResetNutricionalPage onNavigateHome={navigateHome} />}

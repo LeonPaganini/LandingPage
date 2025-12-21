@@ -1,6 +1,7 @@
 import React from "react";
 import { enviarLeadReset } from "./leadService.js";
 import { CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
+import { openWhatsappForCta } from "./lib/whatsapp.js";
 
 const benefitCards = [
   "Desincha em 7–14 dias com protocolos simples",
@@ -271,7 +272,7 @@ const ResetNutricionalPage: React.FC<{ onNavigateHome: () => void }> = ({ onNavi
                 />
                 <button
                   type="button"
-                  onClick={scrollToForm}
+                  onClick={() => openWhatsappForCta("Tirar dúvidas rápidas", "reset-nutricional")}
                   className="rounded-full border border-neutral-900/10 px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40"
                 >
                   Tirar dúvidas rápidas
