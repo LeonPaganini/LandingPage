@@ -39,9 +39,9 @@ export const WHATSAPP_CONFIG = {
 };
 
 export const APP_NUTRI_CONFIG = {
-  label: "AppNutri",
+  label: "AppNutri - EM BREVE",
   description: "Plano alimentar inteligente com relatórios e insights personalizados.",
-  url: "https://appnutri.exemplo.com", // TODO: Ajustar para a URL oficial do AppNutri
+  url: "", // TODO: Ajustar para a URL oficial do AppNutri
   ctaLabel: "Acessar AppNutri",
   badge: "Digital",
 };
