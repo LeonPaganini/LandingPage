@@ -32,12 +32,6 @@ export const LINK_BIO_HERO = {
   ctaLabel: "Falar com equipe agora",
 };
 
-export const WHATSAPP_CONFIG = {
-  phone: "21990189004", // TODO: Ajustar para o número oficial
-  default_message:
-    "Olá, Nutri Thais! Acabei de abrir seu link da bio e quero saber mais sobre os atendimentos.",
-};
-
 export const APP_NUTRI_CONFIG = {
   label: "AppNutri - EM BREVE",
   description: "Plano alimentar inteligente com relatórios e insights personalizados.",
