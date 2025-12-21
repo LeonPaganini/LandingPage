@@ -149,6 +149,13 @@ const LinkBio: React.FC<{
               </p>
               <div className="h-[1px] flex-1 bg-gradient-to-l from-primary-500/60 to-transparent" />
             </div>
+            {section.badge && (
+              <div className="flex justify-center">
+                <span className="rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-primary-800">
+                  {section.badge}
+                </span>
+              </div>
+            )}
             <div className="flex flex-col gap-3">
               {section.items.map((item) => (
                 <LinkBioCard key={item.label} item={item} onInternalNavigate={handleInternal} />

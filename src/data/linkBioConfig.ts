@@ -15,6 +15,7 @@ export type LinkBioItem = {
 
 export type LinkBioSection = {
   title: string;
+  badge?: string;
   items: LinkBioItem[];
 };
 
@@ -50,7 +51,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
     title: "Serviços para Você",
     items: [
       {
-        label: "Atendimento com a Nutri",
+        label: "Atendimento Online com a Nutri",
         description: "Fale comigo para definir o acompanhamento ideal",
         icon: "💬",
         action_type: "whatsapp",
@@ -58,8 +59,20 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         priority: 1,
         highlight: true,
         whatsappMessage:
-          "Olá, Nutri Thais! Quero falar sobre o acompanhamento individual.",
+          "Olá! Quero agendar um atendimento online com a nutri. Pode me passar horários e valores?",
         ctaLabel: "Falar comigo",
+      },
+      {
+        label: "Atendimento Presencial - Barra da Tijuca-RJ",
+        description: "Agende sua consulta presencial na Barra da Tijuca-RJ",
+        icon: "📍",
+        action_type: "whatsapp",
+        route_or_url: "",
+        priority: 2,
+        highlight: true,
+        whatsappMessage:
+          "Olá! Tenho interesse em atendimento presencial na Barra da Tijuca-RJ. Pode me passar horários, local e valores?",
+        ctaLabel: "Agendar presencial",
       },
       {
         label: APP_NUTRI_CONFIG.label,
@@ -67,7 +80,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         icon: "📱",
         action_type: "external",
         route_or_url: APP_NUTRI_CONFIG.url,
-        priority: 2,
+        priority: 3,
         highlight: true,
         badge: APP_NUTRI_CONFIG.badge,
         ctaLabel: APP_NUTRI_CONFIG.ctaLabel,
@@ -78,7 +91,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         icon: "📊",
         action_type: "internal",
         route_or_url: "https://thaispaganini.onrender.com/?page=calculadora_gordura",
-        priority: 3,
+        priority: 4,
         highlight: true,
         ctaLabel: "Usar calculadora",
       },
@@ -88,26 +101,13 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         icon: "✨",
         action_type: "internal",
         route_or_url: "https://thaispaganini.onrender.com/?page=reset-nutricional",
-        priority: 4,
+        priority: 5,
         ctaLabel: "Entrar no programa",
       },
     ],
   },
   {
-    title: "Grupos / Comunidade",
-    items: [
-      {
-        label: "Cadastro no Grupo de Acompanhamento",
-        description: "Entre para a lista e receba prioridade nas vagas",
-        icon: "🤝",
-        action_type: "external",
-        route_or_url: "https://example.com/grupo-cadastro", // TODO: Ajustar link oficial do grupo
-        priority: 1,
-      },
-    ],
-  },
-  {
-    title: "Contato",
+    title: "Contato Parcerias",
     items: [
       {
         label: "WhatsApp direto",
@@ -116,6 +116,8 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
         action_type: "whatsapp",
         route_or_url: "",
         priority: 1,
+        whatsappMessage:
+          "Olá! Tenho interesse em fechar uma parceria. Podemos conversar sobre formatos e condições?",
       },
       {
         label: "E-mail profissional",
@@ -129,6 +131,7 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
   },
   {
     title: "Materiais / Ebooks / Conteúdos",
+    badge: "Em Breve",
     items: [
       {
         label: "Mini guia de desinchar",
