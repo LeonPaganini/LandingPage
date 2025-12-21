@@ -57,8 +57,8 @@ export const about = {
     "Protocolos leves: você entende, melhora e se mantém bem sem sofrer",
   ],
   image: "https://i.ibb.co/mV1qpwwq/Signos-do-zod-aco-m-stico-neon-azul-fundo-de-tela-para-celular-2.png",
-  imagePositionMobile: "40% 40%",
-  imagePositionDesktop: "45% 35%",
+  imagePositionMobile: "50% 50%",
+  imagePositionDesktop: "50% 48%",
 };
 
 export const programs = [
