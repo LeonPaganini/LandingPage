@@ -1,4 +1,4 @@
-export type RouteKey = "home" | "calculator" | "reset-nutricional" | "link-bio";
+export type RouteKey = "home" | "calculator" | "reset-nutricional" | "link-bio" | "ebooks";
 
 const PAGE_PARAM = "page";
 
@@ -17,6 +17,7 @@ const pageParamRoutes: Record<string, RouteKey> = {
   "reset_nutricional": "reset-nutricional",
   "link-bio": "link-bio",
   "link_bio": "link-bio",
+  ebooks: "ebooks",
   home: "home",
 };
 
@@ -25,6 +26,7 @@ const pathRoutes: Record<string, RouteKey> = {
   "/reset-nutricional": "reset-nutricional",
   "/link-bio": "link-bio",
   "/link_bio": "link-bio",
+  "/ebooks": "ebooks",
 };
 
 export const resolveRoute = (locationLike: Location): RouteKey => {
@@ -59,6 +61,10 @@ export const buildUrlForRoute = (route: RouteKey, currentLocation: Location = wi
     case "link-bio":
       url.pathname = "/";
       url.searchParams.set(PAGE_PARAM, "link_bio");
+      break;
+    case "ebooks":
+      url.pathname = "/ebooks";
+      url.searchParams.delete(PAGE_PARAM);
       break;
     case "home":
     default:
