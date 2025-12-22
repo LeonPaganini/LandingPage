@@ -13,6 +13,7 @@ import {
 import BodyFatCalculator from "./Calculator";
 import ResetNutricionalPage from "./ResetNutricional.js";
 import LinkBio from "./LinkBio.js";
+import EbooksPage from "./Ebooks.js";
 import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
 import {
   RouteKey,
@@ -530,6 +531,7 @@ const App: React.FC = () => {
     () => ({
       calculator: getRouteHref("calculator"),
       reset: getRouteHref("reset-nutricional"),
+      ebooks: getRouteHref("ebooks"),
     }),
     [activePage],
   );
@@ -542,6 +544,11 @@ const App: React.FC = () => {
   const navigateToReset = React.useCallback(() => {
     navigateToRoute("reset-nutricional");
     setActivePage("reset-nutricional");
+  }, []);
+
+  const navigateToEbooks = React.useCallback(() => {
+    navigateToRoute("ebooks");
+    setActivePage("ebooks");
   }, []);
 
   const navigateToLinkBio = React.useCallback(() => {
@@ -580,6 +587,9 @@ const App: React.FC = () => {
         case "reset-nutricional":
           navigateToReset();
           return;
+        case "ebooks":
+          navigateToEbooks();
+          return;
         case "link-bio":
           navigateToLinkBio();
           return;
@@ -589,7 +599,7 @@ const App: React.FC = () => {
           return;
       }
     },
-    [navigateHome, navigateToCalculator, navigateToLinkBio, navigateToReset],
+    [navigateHome, navigateToCalculator, navigateToEbooks, navigateToLinkBio, navigateToReset],
   );
 
   return (
@@ -604,6 +614,16 @@ const App: React.FC = () => {
             Thais Paganini | Nutrição Acolhedora
           </button>
           <div className="flex items-center gap-3">
+            <a
+              href={routeHrefs.ebooks}
+              onClick={(event) => {
+                event.preventDefault();
+                navigateToEbooks();
+              }}
+              className="rounded-full border border-neutral-900/10 px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40"
+            >
+              Ebooks
+            </a>
             <CTAButton
               label="Agendar consulta"
               href={getWhatsappHref("Agendar consulta")}
@@ -624,6 +644,7 @@ const App: React.FC = () => {
           onInternalRoute={handleInternalRoute}
         />
       )}
+      {activePage === "ebooks" && <EbooksPage onNavigateHome={navigateHome} />}
       {activePage === "home" && (
         <LandingContent
           onNavigateToCalculator={navigateToCalculator}

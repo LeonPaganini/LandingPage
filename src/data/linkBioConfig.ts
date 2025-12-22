@@ -125,15 +125,25 @@ export const LINK_BIO_SECTIONS: LinkBioSection[] = [
   },
   {
     title: "Materiais / Ebooks / Conteúdos",
-    badge: "Em Breve",
+    badge: "Novidade",
     items: [
       {
+        label: "Catálogo de Ebooks",
+        description: "Receitas, protocolos e guias para cada momento",
+        icon: "📚",
+        action_type: "internal",
+        route_or_url: "https://thaispaganini.onrender.com/ebooks",
+        priority: 1,
+        highlight: true,
+        badge: "Novo",
+      },
+      {
         label: "Mini guia de desinchar",
-        description: "Receba um resumo com os passos para aliviar inchaço",
+        description: "Passos rápidos para aliviar inchaço e retenção",
         icon: "📘",
         action_type: "external",
-        route_or_url: "", // TODO: Ajustar link oficial do material
-        priority: 1,
+        route_or_url: "https://go.thaispaganini.com/miniguia",
+        priority: 2,
       },
     ],
   },
