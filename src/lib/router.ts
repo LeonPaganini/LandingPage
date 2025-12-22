@@ -55,16 +55,16 @@ export const buildUrlForRoute = (route: RouteKey, currentLocation: Location = wi
       url.searchParams.set(PAGE_PARAM, "calculadora_gordura");
       break;
     case "reset-nutricional":
-      url.pathname = "/reset-nutricional";
-      url.searchParams.delete(PAGE_PARAM);
+      url.pathname = "/";
+      url.searchParams.set(PAGE_PARAM, "reset_nutricional");
       break;
     case "link-bio":
       url.pathname = "/";
       url.searchParams.set(PAGE_PARAM, "link_bio");
       break;
     case "ebooks":
-      url.pathname = "/ebooks";
-      url.searchParams.delete(PAGE_PARAM);
+      url.pathname = "/";
+      url.searchParams.set(PAGE_PARAM, "ebooks");
       break;
     case "home":
     default:
