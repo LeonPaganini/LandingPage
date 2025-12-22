@@ -614,25 +614,10 @@ const App: React.FC = () => {
             Thais Paganini | Nutrição Acolhedora
           </button>
           <div className="flex items-center gap-3">
-            <a
-              href={routeHrefs.ebooks}
-              onClick={(event) => {
-                event.preventDefault();
-                navigateToEbooks();
-              }}
-              className="rounded-full border border-neutral-900/10 px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40"
-            >
-              Ebooks
-            </a>
             <CTAButton
               label="Agendar consulta"
               href={getWhatsappHref("Agendar consulta")}
               onClick={() => handleWhatsappClick("Agendar consulta")}
-            />
-            <CTAButton
-              label="Calcular agora"
-              href={routeHrefs.calculator}
-              onClick={navigateToCalculator}
             />
           </div>
         </div>
