@@ -455,6 +455,106 @@ const BodyFatCalculator: React.FC = () => {
     });
   };
 
+  const wrapText = (context: CanvasRenderingContext2D, text: string, maxWidth: number) => {
+    const words = text.split(" ");
+    const lines: string[] = [];
+    let line = "";
+
+    words.forEach((word) => {
+      const testLine = line ? `${line} ${word}` : word;
+      const metrics = context.measureText(testLine);
+      if (metrics.width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = testLine;
+      }
+    });
+
+    if (line) {
+      lines.push(line);
+    }
+
+    return lines;
+  };
+
+  const truncateLines = (
+    context: CanvasRenderingContext2D,
+    lines: string[],
+    maxWidth: number,
+    maxLines: number
+  ) => {
+    if (lines.length <= maxLines) {
+      return lines;
+    }
+
+    const truncated = lines.slice(0, maxLines);
+    let lastLine = truncated[maxLines - 1];
+    const ellipsis = "…";
+
+    while (context.measureText(`${lastLine}${ellipsis}`).width > maxWidth && lastLine.length > 0) {
+      lastLine = lastLine.slice(0, -1).trimEnd();
+    }
+
+    truncated[maxLines - 1] = `${lastLine}${ellipsis}`;
+    return truncated;
+  };
+
+  const fitTextToWidth = (
+    context: CanvasRenderingContext2D,
+    text: string,
+    maxWidth: number,
+    initialFontPx: number,
+    minFontPx: number,
+    fontTemplate: string
+  ) => {
+    let fontPx = initialFontPx;
+    while (fontPx >= minFontPx) {
+      context.font = fontTemplate.replace("{size}", `${fontPx}`);
+      if (context.measureText(text).width <= maxWidth) {
+        return fontPx;
+      }
+      fontPx -= 2;
+    }
+    return minFontPx;
+  };
+
+  const drawTextBlock = ({
+    ctx,
+    text,
+    x,
+    y,
+    maxWidth,
+    maxLines,
+    lineHeight,
+    font,
+    color,
+    align,
+  }: {
+    ctx: CanvasRenderingContext2D;
+    text: string;
+    x: number;
+    y: number;
+    maxWidth: number;
+    maxLines: number;
+    lineHeight: number;
+    font: string;
+    color: string;
+    align: CanvasTextAlign;
+  }) => {
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.textBaseline = "top";
+
+    const lines = truncateLines(ctx, wrapText(ctx, text, maxWidth), maxWidth, maxLines);
+    lines.forEach((line, index) => {
+      ctx.fillText(line, x, y + index * lineHeight);
+    });
+
+    return { heightUsed: lines.length * lineHeight, linesDrawn: lines };
+  };
+
   const downloadInstagramPost = async () => {
     if (!result) {
       setSubmitError("Calcule seu percentual antes de gerar a arte compartilhável.");
@@ -463,15 +563,21 @@ const BodyFatCalculator: React.FC = () => {
 
     try {
       setIsDownloading(true);
-      const width = 1080;
-      const height = 1920;
+      const CANVAS_W = 1080;
+      const CANVAS_H = 1920;
+      const SAFE = 120;
+      const SP_2 = 24;
+      const SP_3 = 32;
+      const SP_4 = 44;
+      const width = CANVAS_W;
+      const height = CANVAS_H;
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas não suportado");
 
-      const drawRoundedRect = (
+      const drawRoundedRectPath = (
         context: CanvasRenderingContext2D,
         x: number,
         y: number,
@@ -490,34 +596,29 @@ const BodyFatCalculator: React.FC = () => {
         context.lineTo(x, y + radius);
         context.quadraticCurveTo(x, y, x + radius, y);
         context.closePath();
+      };
+
+      const drawRoundedRect = (
+        context: CanvasRenderingContext2D,
+        x: number,
+        y: number,
+        rectWidth: number,
+        rectHeight: number,
+        radius: number
+      ) => {
+        drawRoundedRectPath(context, x, y, rectWidth, rectHeight, radius);
         context.fill();
       };
 
-      const drawWrappedText = (
+      const measureTextBlock = (
         context: CanvasRenderingContext2D,
         text: string,
-        x: number,
-        y: number,
         maxWidth: number,
+        maxLines: number,
         lineHeight: number
       ) => {
-        const words = text.split(" ");
-        let line = "";
-        let currentY = y;
-
-        for (let n = 0; n < words.length; n += 1) {
-          const testLine = `${line}${words[n]} `;
-          const metrics = context.measureText(testLine);
-          if (metrics.width > maxWidth && n > 0) {
-            context.fillText(line.trim(), x, currentY);
-            line = `${words[n]} `;
-            currentY += lineHeight;
-          } else {
-            line = testLine;
-          }
-        }
-        context.fillText(line.trim(), x, currentY);
-        return currentY + lineHeight;
+        const lines = truncateLines(context, wrapText(context, text, maxWidth), maxWidth, maxLines);
+        return { height: lines.length * lineHeight, lines };
       };
 
       const gradient = ctx.createLinearGradient(0, 0, width, height);
@@ -527,112 +628,294 @@ const BodyFatCalculator: React.FC = () => {
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      const cardWidth = width * 0.86;
-      const cardHeight = height - 240;
-      const cardX = (width - cardWidth) / 2;
-      const cardY = 120;
-      const cardRadius = 40;
+      const contentBounds = {
+        left: SAFE,
+        right: width - SAFE,
+        top: SAFE,
+        bottom: height - SAFE,
+      };
+      const cardWidth = contentBounds.right - contentBounds.left;
+      const cardHeight = contentBounds.bottom - contentBounds.top;
+      const cardX = contentBounds.left;
+      const cardY = contentBounds.top;
+      const cardRadius = 44;
 
       ctx.save();
-      ctx.filter = "blur(14px)";
-      ctx.fillStyle = "rgba(255,255,255,0.22)";
+      ctx.shadowColor = "rgba(15,23,42,0.12)";
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 8;
+      ctx.fillStyle = "rgba(255,255,255,0.18)";
       drawRoundedRect(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
       ctx.restore();
 
       ctx.save();
-      ctx.shadowColor = "rgba(15,23,42,0.14)";
-      ctx.shadowBlur = 26;
-      ctx.shadowOffsetY = 12;
-      ctx.fillStyle = "rgba(255,255,255,0.26)";
-      drawRoundedRect(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 2;
+      drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
+      ctx.stroke();
       ctx.restore();
 
-      const innerPadding = 96;
-      const contentMaxWidth = cardWidth - innerPadding * 2;
+      const innerCardOffset = 28;
+      const innerCardX = cardX + innerCardOffset;
+      const innerCardY = cardY + innerCardOffset;
+      const innerCardWidth = cardWidth - innerCardOffset * 2;
+      const innerCardHeight = cardHeight - innerCardOffset * 2;
+      const innerCardRadius = 36;
+
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,0.18)";
+      drawRoundedRect(ctx, innerCardX, innerCardY, innerCardWidth, innerCardHeight, innerCardRadius);
+      ctx.restore();
+
+      const innerPadding = 56;
+      const innerContentX = innerCardX + innerPadding;
+      const innerContentWidth = innerCardWidth - innerPadding * 2;
+      const innerContentY = innerCardY + innerPadding;
+      const innerContentBottom = innerCardY + innerCardHeight - innerPadding;
       const centerX = width / 2;
-      let currentY = cardY + 120;
+      const footerText =
+        "Calculadora de Gordura – Desenvolvida por Nutri Thaís Paganini";
+      const footerFontTemplate = "600 {size}px 'Inter', Arial";
+      const footerFontPx = fitTextToWidth(ctx, footerText, innerContentWidth, 24, 20, footerFontTemplate);
+      const footerLineHeight = Math.round(footerFontPx * 1.4);
+      const footerY = innerContentBottom - footerLineHeight;
 
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
+      const maxContentBottom = footerY - SP_2;
 
-      ctx.fillStyle = "#0F172A";
-      ctx.font = "800 56px 'Poppins', 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Meu Resultado – % de Gordura Corporal", centerX, currentY);
+      const titleText = "Meu Resultado – % de Gordura Corporal";
+      const subtitleText = "Método Marinha Americana";
+      const labelText = "Meu percentual de gordura:";
+      const rangeText = `Faixa: ${result.classification}`;
+      const supportingText = selectPersonalizedPhrase(result.classification);
+      const shareText = "Compartilhe o seu também e me marque!";
+      const ctaTitle = "Calcule Gratuitamente";
+      const ctaSubtitle = "Descubra o seu resultado em 10 segundos.";
 
-      currentY += 66;
-      ctx.fillStyle = "#1f2937";
-      ctx.font = "600 34px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Método Marinha Americana", centerX, currentY);
+      const titleFont = "800 60px 'Poppins', 'Inter', Arial";
+      const titleLineHeight = 74;
+      const subtitleFont = "700 34px 'Inter', Arial";
+      const subtitleLineHeight = 44;
+      const labelFont = "700 36px 'Inter', Arial";
+      const labelLineHeight = 46;
+      const rangeFontTemplate = "800 {size}px 'Inter', Arial";
+      const supportingFont = "500 34px 'Inter', Arial";
+      const supportingLineHeight = 46;
+      const shareFont = "800 40px 'Inter', Arial";
+      const shareLineHeight = 54;
+      const ctaWidth = Math.min(innerContentWidth, 820);
+      const ctaHeight = 132;
+      const ctaRadius = 30;
 
-      currentY += 86;
-      ctx.fillStyle = "#111827";
-      ctx.font = "700 38px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Meu percentual de gordura:", centerX, currentY);
+      const computeContentHeight = (kpiFontPx: number) => {
+        ctx.font = titleFont;
+        const titleMetrics = measureTextBlock(ctx, titleText, innerContentWidth, 2, titleLineHeight);
+        ctx.font = subtitleFont;
+        const subtitleMetrics = measureTextBlock(ctx, subtitleText, innerContentWidth, 1, subtitleLineHeight);
+        ctx.font = labelFont;
+        const labelMetrics = measureTextBlock(ctx, labelText, innerContentWidth, 1, labelLineHeight);
 
-      currentY += 130;
-      ctx.fillStyle = "#0b1f17";
-      ctx.font = "800 150px 'Poppins', 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText(`${result.value.toFixed(1)}%`, centerX, currentY);
+        ctx.font = `900 ${kpiFontPx}px 'Poppins', 'Inter', Arial`;
+        const kpiMetrics = measureTextBlock(ctx, `${result.value.toFixed(1)}%`, innerContentWidth, 1, kpiFontPx);
 
-      currentY += 120;
-      ctx.fillStyle = "#0f2f22";
-      ctx.font = "700 40px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText(`Faixa: ${result.classification}`, centerX, currentY);
+        const rangeFontPx = fitTextToWidth(ctx, rangeText, innerContentWidth, 44, 36, rangeFontTemplate);
+        const rangeLineHeight = Math.round(rangeFontPx * 1.3);
+        ctx.font = rangeFontTemplate.replace("{size}", `${rangeFontPx}`);
+        const rangeMetrics = measureTextBlock(ctx, rangeText, innerContentWidth, 1, rangeLineHeight);
 
-      currentY += 80;
-      ctx.fillStyle = "#111827";
-      ctx.font = "500 34px 'Inter', 'Helvetica Neue', Arial";
+        ctx.font = supportingFont;
+        const supportingMetrics = measureTextBlock(ctx, supportingText, innerContentWidth, 3, supportingLineHeight);
 
-      const drawPersonalizedText = drawWrappedText(
+        ctx.font = shareFont;
+        const shareMetrics = measureTextBlock(ctx, shareText, innerContentWidth, 2, shareLineHeight);
+
+        const totalHeight =
+          titleMetrics.height +
+          SP_2 +
+          subtitleMetrics.height +
+          SP_3 +
+          labelMetrics.height +
+          SP_2 +
+          kpiMetrics.height +
+          SP_3 +
+          rangeMetrics.height +
+          SP_2 +
+          supportingMetrics.height +
+          SP_3 +
+          shareMetrics.height +
+          SP_4 +
+          ctaHeight;
+
+        return {
+          totalHeight,
+          rangeFontPx,
+          rangeLineHeight,
+        };
+      };
+
+      let kpiFontPx = 190;
+      let layoutMetrics = computeContentHeight(kpiFontPx);
+
+      while (layoutMetrics.totalHeight > maxContentBottom - innerContentY && kpiFontPx > 150) {
+        kpiFontPx -= 10;
+        layoutMetrics = computeContentHeight(kpiFontPx);
+      }
+
+      let cursorY = innerContentY;
+
+      const titleBlock = drawTextBlock({
         ctx,
-        selectPersonalizedPhrase(result.classification),
-        centerX,
-        currentY,
-        contentMaxWidth,
-        48
-      );
+        text: titleText,
+        x: centerX,
+        y: cursorY,
+        maxWidth: innerContentWidth,
+        maxLines: 2,
+        lineHeight: titleLineHeight,
+        font: titleFont,
+        color: "#0B1F18",
+        align: "center",
+      });
+      cursorY += titleBlock.heightUsed + SP_2;
 
-      currentY = drawPersonalizedText + 48;
-      ctx.fillStyle = "#0b1f17";
-      ctx.font = "700 42px 'Inter', 'Helvetica Neue', Arial";
-      const drawViral = drawWrappedText(
+      const subtitleBlock = drawTextBlock({
         ctx,
-        "Compartilhe o seu também e me marque!",
-        centerX,
-        currentY,
-        contentMaxWidth - 80,
-        50
-      );
+        text: subtitleText,
+        x: centerX,
+        y: cursorY,
+        maxWidth: innerContentWidth,
+        maxLines: 1,
+        lineHeight: subtitleLineHeight,
+        font: subtitleFont,
+        color: "#1D4B3C",
+        align: "center",
+      });
+      cursorY += subtitleBlock.heightUsed + SP_3;
 
-      currentY = drawViral + 90;
-      const ctaWidth = cardWidth - 200;
-      const ctaHeight = 170;
+      const labelBlock = drawTextBlock({
+        ctx,
+        text: labelText,
+        x: centerX,
+        y: cursorY,
+        maxWidth: innerContentWidth,
+        maxLines: 1,
+        lineHeight: labelLineHeight,
+        font: labelFont,
+        color: "#163D31",
+        align: "center",
+      });
+      cursorY += labelBlock.heightUsed + SP_2;
+
+      const kpiFont = `900 ${kpiFontPx}px 'Poppins', 'Inter', Arial`;
+      const kpiBlock = drawTextBlock({
+        ctx,
+        text: `${result.value.toFixed(1)}%`,
+        x: centerX,
+        y: cursorY,
+        maxWidth: innerContentWidth,
+        maxLines: 1,
+        lineHeight: kpiFontPx,
+        font: kpiFont,
+        color: "#0B1F18",
+        align: "center",
+      });
+      cursorY += kpiBlock.heightUsed + SP_3;
+
+      const rangeFont = rangeFontTemplate.replace("{size}", `${layoutMetrics.rangeFontPx}`);
+      const rangeBlock = drawTextBlock({
+        ctx,
+        text: rangeText,
+        x: centerX,
+        y: cursorY,
+        maxWidth: innerContentWidth,
+        maxLines: 1,
+        lineHeight: layoutMetrics.rangeLineHeight,
+        font: rangeFont,
+        color: "#1D4B3C",
+        align: "center",
+      });
+      cursorY += rangeBlock.heightUsed + SP_2;
+
+      const supportingBlock = drawTextBlock({
+        ctx,
+        text: supportingText,
+        x: centerX,
+        y: cursorY,
+        maxWidth: innerContentWidth,
+        maxLines: 3,
+        lineHeight: supportingLineHeight,
+        font: supportingFont,
+        color: "#163D31",
+        align: "center",
+      });
+      cursorY += supportingBlock.heightUsed + SP_3;
+
+      const shareBlock = drawTextBlock({
+        ctx,
+        text: shareText,
+        x: centerX,
+        y: cursorY,
+        maxWidth: innerContentWidth,
+        maxLines: 2,
+        lineHeight: shareLineHeight,
+        font: shareFont,
+        color: "#0B1F18",
+        align: "center",
+      });
+      cursorY += shareBlock.heightUsed + SP_4;
+
       const ctaX = centerX - ctaWidth / 2;
-      const ctaY = currentY - ctaHeight / 2;
+      const ctaY = Math.min(cursorY, maxContentBottom - ctaHeight);
 
       ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.18)";
-      ctx.shadowBlur = 24;
-      ctx.shadowOffsetY = 12;
-      ctx.fillStyle = "#0f3d2f";
-      drawRoundedRect(ctx, ctaX, ctaY, ctaWidth, ctaHeight, 38);
+      ctx.shadowColor = "rgba(15,61,47,0.25)";
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 10;
+      ctx.fillStyle = "#0F3D2F";
+      drawRoundedRect(ctx, ctaX, ctaY, ctaWidth, ctaHeight, ctaRadius);
       ctx.restore();
 
-      ctx.fillStyle = "#f9fafb";
-      ctx.font = "800 44px 'Poppins', 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Calcule Gratuitamente", centerX, ctaY + 68);
+      const ctaTitleFont = "900 44px 'Poppins', 'Inter', Arial";
+      const ctaSubtitleFont = "600 26px 'Inter', Arial";
+      const ctaTitleLineHeight = 52;
+      const ctaSubtitleLineHeight = 34;
 
-      ctx.fillStyle = "rgba(249,250,251,0.86)";
-      ctx.font = "500 30px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText("Descubra o seu resultado em 10 segundos.", centerX, ctaY + 116);
+      drawTextBlock({
+        ctx,
+        text: ctaTitle,
+        x: centerX,
+        y: ctaY + 26,
+        maxWidth: ctaWidth - SP_4,
+        maxLines: 1,
+        lineHeight: ctaTitleLineHeight,
+        font: ctaTitleFont,
+        color: "#FFFFFF",
+        align: "center",
+      });
 
-      ctx.fillStyle = "#1f2937";
-      ctx.font = "500 26px 'Inter', 'Helvetica Neue', Arial";
-      ctx.fillText(
-        "Calculadora de Gordura – Desenvolvida por Nutri Thaís Paganini",
-        centerX,
-        cardY + cardHeight - 80
-      );
+      drawTextBlock({
+        ctx,
+        text: ctaSubtitle,
+        x: centerX,
+        y: ctaY + 26 + ctaTitleLineHeight,
+        maxWidth: ctaWidth - SP_4,
+        maxLines: 2,
+        lineHeight: ctaSubtitleLineHeight,
+        font: ctaSubtitleFont,
+        color: "rgba(255,255,255,0.86)",
+        align: "center",
+      });
+
+      drawTextBlock({
+        ctx,
+        text: footerText,
+        x: centerX,
+        y: footerY,
+        maxWidth: innerContentWidth,
+        maxLines: 1,
+        lineHeight: footerLineHeight,
+        font: footerFontTemplate.replace("{size}", `${footerFontPx}`),
+        color: "rgba(11,31,24,0.70)",
+        align: "center",
+      });
 
       const link = document.createElement("a");
       link.download = "calculadora-gordura-marinha-instagram.png";
