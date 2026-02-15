@@ -24,8 +24,25 @@ const normalizePathname = (pathname: string): string => {
   return trimmed === "" ? "/" : trimmed.toLowerCase();
 };
 
-const normalizePageValue = (value: string | null): string =>
-  (value ?? "").trim().toLowerCase().replace(/_/g, "-");
+const normalizePageValue = (value: string | null): string => {
+  const raw = (value ?? "").trim();
+  if (!raw) return "";
+
+  let decoded = raw;
+  try {
+    decoded = decodeURIComponent(raw);
+  } catch {
+    // Keep raw value when malformed URI sequences are present.
+  }
+
+  return decoded
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, "-")
+    .replace(/^[\/]+/, "")
+    .replace(/[\/]+$/, "")
+    .replace(/[?#].*$/, "");
+};
 
 const pageParamRoutes: Record<string, RouteKey> = {
   "calculadora-gordura": "calculator",
@@ -58,12 +75,12 @@ const pathRoutes: Record<string, RouteKey> = {
 export const resolveRoute = (locationLike: Location): RouteKey => {
   const params = new URLSearchParams(locationLike.search);
   const normalizedPage = normalizePageValue(params.get(PAGE_PARAM));
+  const normalizedPath = normalizePathname(locationLike.pathname);
 
   if (normalizedPage && normalizedPage in pageParamRoutes) {
     return pageParamRoutes[normalizedPage];
   }
 
-  const normalizedPath = normalizePathname(locationLike.pathname);
   if (normalizedPath in pathRoutes) {
     return pathRoutes[normalizedPath];
   }
