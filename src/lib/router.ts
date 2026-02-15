@@ -9,6 +9,15 @@ export type RouteKey =
 
 const PAGE_PARAM = "page";
 
+const canonicalPageByRoute: Record<Exclude<RouteKey, "home">, string> = {
+  calculator: "calculadora-gordura",
+  "reset-nutricional": "reset-nutricional",
+  "link-bio": "link-bio",
+  ebooks: "ebooks",
+  "controle-metabolico-barra": "controle-metabolico-barra",
+  "consulta-online-controle-peso": "consulta-online-controle-peso",
+};
+
 const normalizePathname = (pathname: string): string => {
   const trimmed = pathname.replace(/\/$/, "");
   return trimmed === "" ? "/" : trimmed.toLowerCase();
@@ -61,37 +70,14 @@ export const buildUrlForRoute = (route: RouteKey, currentLocation: Location = wi
   const url = new URL(currentLocation.href);
   url.hash = currentLocation.hash;
 
-  switch (route) {
-    case "calculator":
-      url.pathname = "/calculadora-gordura";
-      url.searchParams.delete(PAGE_PARAM);
-      break;
-    case "reset-nutricional":
-      url.pathname = "/reset-nutricional";
-      url.searchParams.delete(PAGE_PARAM);
-      break;
-    case "link-bio":
-      url.pathname = "/link-bio";
-      url.searchParams.delete(PAGE_PARAM);
-      break;
-    case "ebooks":
-      url.pathname = "/ebooks";
-      url.searchParams.delete(PAGE_PARAM);
-      break;
-    case "controle-metabolico-barra":
-      url.pathname = "/controle-metabolico-barra";
-      url.searchParams.delete(PAGE_PARAM);
-      break;
-    case "consulta-online-controle-peso":
-      url.pathname = "/consulta-online-controle-peso";
-      url.searchParams.delete(PAGE_PARAM);
-      break;
-    case "home":
-    default:
-      url.pathname = "/";
-      url.searchParams.delete(PAGE_PARAM);
-      break;
+  url.pathname = "/";
+
+  if (route === "home") {
+    url.searchParams.delete(PAGE_PARAM);
+    return url;
   }
+
+  url.searchParams.set(PAGE_PARAM, canonicalPageByRoute[route]);
 
   return url;
 };
@@ -108,6 +94,7 @@ export const navigateToRoute = (
   const url = buildUrlForRoute(route);
   const method = options?.replace ? "replaceState" : "pushState";
   window.history[method]({}, "", url);
+  window.dispatchEvent(new PopStateEvent("popstate"));
 
   if (options?.scroll !== false) {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -121,7 +108,9 @@ export const normalizeAndResolveRoute = (locationLike: Location = window.locatio
     canonicalUrl.pathname === locationLike.pathname && canonicalUrl.search === locationLike.search;
 
   if (!isSamePath) {
-    window.history.replaceState({}, "", canonicalUrl);
+    if (typeof window !== "undefined" && window.history && locationLike === window.location) {
+      window.history.replaceState({}, "", canonicalUrl);
+    }
   }
 
   return route;
