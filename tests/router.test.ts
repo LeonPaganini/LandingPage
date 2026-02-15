@@ -56,3 +56,17 @@ test("buildUrlForRoute gera canonical query routes para páginas internas", () =
   assert.equal(calculator.pathname, "/");
   assert.equal(calculator.searchParams.get("page"), "calculadora-gordura");
 });
+
+
+test("normalizeAndResolveRoute aceita legacy underscores nas rotas de ads", () => {
+  const controle = buildLocation("/", "?page=controle_metabolico_barra");
+  const consulta = buildLocation("/", "?page=consulta_online_controle_peso");
+
+  assert.equal(normalizeAndResolveRoute(controle as Location), "controle-metabolico-barra");
+  assert.equal(normalizeAndResolveRoute(consulta as Location), "consulta-online-controle-peso");
+});
+
+test("normalizeAndResolveRoute reconhece /index.html das rotas", () => {
+  const location = buildLocation("/controle-metabolico-barra/index.html");
+  assert.equal(normalizeAndResolveRoute(location as Location), "controle-metabolico-barra");
+});

@@ -19,7 +19,8 @@ const canonicalPageByRoute: Record<Exclude<RouteKey, "home">, string> = {
 };
 
 const normalizePathname = (pathname: string): string => {
-  const trimmed = pathname.replace(/\/$/, "");
+  const withoutIndex = pathname.replace(/\/index\.html$/i, "");
+  const trimmed = withoutIndex.replace(/\/$/, "");
   return trimmed === "" ? "/" : trimmed.toLowerCase();
 };
 
@@ -35,7 +36,9 @@ const pageParamRoutes: Record<string, RouteKey> = {
   "link_bio": "link-bio",
   ebooks: "ebooks",
   "controle-metabolico-barra": "controle-metabolico-barra",
+  "controle_metabolico_barra": "controle-metabolico-barra",
   "consulta-online-controle-peso": "consulta-online-controle-peso",
+  "consulta_online_controle_peso": "consulta-online-controle-peso",
   home: "home",
 };
 
@@ -47,7 +50,9 @@ const pathRoutes: Record<string, RouteKey> = {
   "/link_bio": "link-bio",
   "/ebooks": "ebooks",
   "/controle-metabolico-barra": "controle-metabolico-barra",
+  "/controle_metabolico_barra": "controle-metabolico-barra",
   "/consulta-online-controle-peso": "consulta-online-controle-peso",
+  "/consulta_online_controle_peso": "consulta-online-controle-peso",
 };
 
 export const resolveRoute = (locationLike: Location): RouteKey => {

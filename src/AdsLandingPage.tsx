@@ -88,8 +88,10 @@ const ADS_COPIES: Record<AdsRouteKey, LandingCopy> = {
   },
 };
 
-const useAdsHead = (copy: LandingCopy) => {
+const useAdsHead = (copy: LandingCopy | null) => {
   React.useEffect(() => {
+    if (!copy) return;
+
     const previousTitle = document.title;
     const previousRobots = document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? "";
     const previousDescription =
@@ -140,13 +142,28 @@ const defaultValues: AdsLeadFormValues = {
 };
 
 const AdsLandingPage: React.FC<{ routeKey: AdsRouteKey }> = ({ routeKey }) => {
-  const copy = ADS_COPIES[routeKey];
+  const copy = ADS_COPIES[routeKey] ?? null;
   const [values, setValues] = React.useState(defaultValues);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [successMessage, setSuccessMessage] = React.useState("");
 
   useAdsHead(copy);
+
+  if (!copy) {
+    return (
+      <SectionWave className="bg-red-50">
+        <div className="mx-auto max-w-3xl px-6 py-16">
+          <GlassCard className="border-red-200 bg-white p-6">
+            <h1 className="text-2xl font-semibold text-red-700">Rota de campanha não configurada</h1>
+            <p className="mt-2 text-sm text-red-700">
+              A rota <code className="font-mono">{routeKey}</code> não possui configuração explícita em ADS_COPIES.
+            </p>
+          </GlassCard>
+        </div>
+      </SectionWave>
+    );
+  }
 
   const handleChange = (field: keyof AdsLeadFormValues) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
