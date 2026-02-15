@@ -14,6 +14,7 @@ Este projeto usa **query routing** como padrão público/canonical, via `src/lib
 - parâmetro oficial: `page`
 - canonical de páginas internas: `/?page=<slug>`
 - home canonical: `/`
+- O roteamento público é via `?page=` e o valor é normalizado (remove `/` nas bordas e lixo colado após `?`/`#`).
 
 ### URLs oficiais (canonical)
 - Home: `https://thaispaganini.com.br/`

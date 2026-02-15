@@ -70,3 +70,21 @@ test("normalizeAndResolveRoute reconhece /index.html das rotas", () => {
   const location = buildLocation("/controle-metabolico-barra/index.html");
   assert.equal(normalizeAndResolveRoute(location as Location), "controle-metabolico-barra");
 });
+
+
+test("normalizeAndResolveRoute normaliza variações de page para ads + preserva UTM", () => {
+  const withLeadingAndTrailingSlash = buildLocation("/", "?page=/controle-metabolico-barra/");
+  const withCanonical = buildLocation("/", "?page=controle-metabolico-barra");
+  const withUtm = buildLocation("/", "?page=controle-metabolico-barra&utm_source=google");
+  const consulta = buildLocation("/", "?page=consulta-online-controle-peso");
+
+  assert.equal(normalizeAndResolveRoute(withLeadingAndTrailingSlash as Location), "controle-metabolico-barra");
+  assert.equal(normalizeAndResolveRoute(withCanonical as Location), "controle-metabolico-barra");
+  assert.equal(normalizeAndResolveRoute(withUtm as Location), "controle-metabolico-barra");
+  assert.equal(normalizeAndResolveRoute(consulta as Location), "consulta-online-controle-peso");
+});
+
+test("normalizeAndResolveRoute remove sufixo colado inválido no parâmetro page", () => {
+  const withHashSuffix = buildLocation("/", "?page=controle-metabolico-barra%23x");
+  assert.equal(normalizeAndResolveRoute(withHashSuffix as Location), "controle-metabolico-barra");
+});
