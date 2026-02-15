@@ -26,7 +26,7 @@ export const LINK_BIO_PROFILE = {
 
 export const LINK_BIO_HERO = {
   photo:
-    "https://i.ibb.co/CpfgsxS5/Signos-do-zod-aco-m-stico-neon-azul-fundo-de-tela-para-celular-1.png",
+    "https://i.ibb.co/CprMFS9t/Signos-do-zod-aco-m-stico-neon-azul-fundo-de-tela-para-celular-1.png",
   headline: "Viva leve, com orientação e acolhimento",
   subheadline: "Escolha o melhor caminho para falar com minha equipe ou acessar os programas.",
   ctaLabel: "Falar com equipe agora",

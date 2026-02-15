@@ -23,7 +23,7 @@ export const hero = {
     "Reduza inchaço, fadiga, ansiedade alimentar e o sobrepeso com planos guiados, humanos e feitos para pessoas reais — com rotinas reais.",
   badges: ["+1000 pessoas acompanhadas", "Planos 100% personalizados", "Equilíbrio, não restrição"],
   image:
-    "https://i.ibb.co/qLwv9x86/nutri-hero.png",
+    "https://i.ibb.co/SDw3bFft/nutri-hero.png",
   imagePositionMobile: "40% 20%",
   imagePositionDesktop: "60% 20%",
   ctaPrimary: "Quero saber mais",
@@ -56,7 +56,7 @@ export const about = {
     "Especialista em sintomas como inchaço, fadiga, compulsão e humor instável",
     "Protocolos leves: você entende, melhora e se mantém bem sem sofrer",
   ],
-  image: "https://i.ibb.co/mV1qpwwq/Signos-do-zod-aco-m-stico-neon-azul-fundo-de-tela-para-celular-2.png",
+  image: "https://i.ibb.co/nq22kXzH/Signos-do-zod-aco-m-stico-neon-azul-fundo-de-tela-para-celular-2.png",
   imagePositionMobile: "50% 10%",
   imagePositionDesktop: "50% 10%",
 };
