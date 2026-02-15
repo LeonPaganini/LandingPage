@@ -2,10 +2,13 @@ import React from "react";
 import { Badge, CTAButton, GlassCard, SectionWave } from "./ui/Primitives";
 import {
   ADS_ROUTE_META,
+  ADS_ROUTE_SLUG,
   AdsLeadFormValues,
+  AdsPageDataPayload,
   AdsRouteKey,
   buildWhatsAppRedirectUrl,
   captureUtmParams,
+  fetchAdsPageData,
   normalizeAdsLeadPayload,
   submitAdsLead,
   triggerConversionEvent,
@@ -15,7 +18,6 @@ import {
 type LandingCopy = {
   title: string;
   description: string;
-  canonicalPath: string;
   h1: string;
   subheadline: string;
   cta: string;
@@ -23,17 +25,13 @@ type LandingCopy = {
   heroAlt: string;
   sectionOneTitle: string;
   sectionOneItems: string[];
-  sectionTwoTitle: string;
-  sectionTwoItems: string[];
-  scarcity?: string;
 };
 
-const ADS_COPIES: Record<AdsRouteKey, LandingCopy> = {
+const ADS_FALLBACK_COPY: Record<AdsRouteKey, LandingCopy> = {
   controle_metabolico_barra: {
     title: "Nutricionista na Barra da Tijuca | Controle metabólico feminino",
     description:
       "Atendimento clínico individual no Shopping Downtown para mulheres com dificuldade de emagrecimento e sintomas metabólicos persistentes.",
-    canonicalPath: "/?page=controle_metabolico_barra",
     h1: "Nutricionista na Barra da Tijuca para controle de peso e saúde metabólica feminina",
     subheadline:
       "Atendimento clínico individual no Shopping Downtown para mulheres com dificuldade de emagrecimento e sintomas metabólicos persistentes.",
@@ -49,21 +47,10 @@ const ADS_COPIES: Record<AdsRouteKey, LandingCopy> = {
       "Cansaço frequente e queda de energia",
       "Exames alterados (quando aplicável)",
     ],
-    sectionTwoTitle: "Método de atendimento presencial",
-    sectionTwoItems: [
-      "Pré-consulta estruturada (anamnese + histórico)",
-      "Consulta clínica aprofundada",
-      "Estratégia personalizada para rotina real",
-      "Material complementar (ebooks/orientações)",
-      "Pós-consulta com direcionamento",
-    ],
-    scarcity: "Apenas 4 vagas presenciais por semana.",
   },
   consulta_online_controle_peso: {
     title: "Consulta nutricional online | Controle de peso e metabolismo",
-    description:
-      "Atendimento individual com retorno estruturado em 45 dias para ajuste de estratégia.",
-    canonicalPath: "/?page=consulta_online_controle_peso",
+    description: "Atendimento individual com retorno estruturado em 45 dias para ajuste de estratégia.",
     h1: "Consulta nutricional online para controle de peso e organização metabólica",
     subheadline: "Atendimento individual com retorno estruturado em 45 dias para ajuste de estratégia.",
     cta: "Solicitar consulta online",
@@ -77,25 +64,14 @@ const ADS_COPIES: Record<AdsRouteKey, LandingCopy> = {
       "Retorno em 45 dias (reavaliação + nova estratégia)",
       "Parcelamento em até 2x",
     ],
-    sectionTwoTitle: "Como funciona o processo",
-    sectionTwoItems: [
-      "Triagem inicial com contexto clínico e rotina",
-      "Plano alimentar com estratégia aplicável no dia a dia",
-      "Ajustes direcionados conforme evolução",
-      "Material complementar para reforçar adesão",
-      "Acompanhamento com retorno estruturado",
-    ],
   },
 };
 
-const useAdsHead = (copy: LandingCopy | null) => {
+const useAdsHead = (copy: LandingCopy, routeKey: AdsRouteKey) => {
   React.useEffect(() => {
-    if (!copy) return;
-
     const previousTitle = document.title;
     const previousRobots = document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? "";
-    const previousDescription =
-      document.querySelector('meta[name="description"]')?.getAttribute("content") ?? "";
+    const previousDescription = document.querySelector('meta[name="description"]')?.getAttribute("content") ?? "";
 
     document.title = copy.title;
 
@@ -119,7 +95,7 @@ const useAdsHead = (copy: LandingCopy | null) => {
       document.head.appendChild(canonical);
     }
 
-    const canonicalHref = new URL(copy.canonicalPath, window.location.origin).toString();
+    const canonicalHref = new URL(`/?page=${ADS_ROUTE_SLUG[routeKey]}`, window.location.origin).toString();
     const previousCanonical = canonical.getAttribute("href") ?? "";
     canonical.setAttribute("href", canonicalHref);
 
@@ -129,7 +105,7 @@ const useAdsHead = (copy: LandingCopy | null) => {
       ensureMeta('meta[name="description"]', "description", previousDescription);
       canonical?.setAttribute("href", previousCanonical);
     };
-  }, [copy]);
+  }, [copy, routeKey]);
 };
 
 const defaultValues: AdsLeadFormValues = {
@@ -142,28 +118,39 @@ const defaultValues: AdsLeadFormValues = {
 };
 
 const AdsLandingPage: React.FC<{ routeKey: AdsRouteKey }> = ({ routeKey }) => {
-  const copy = ADS_COPIES[routeKey] ?? null;
+  const fallbackCopy = ADS_FALLBACK_COPY[routeKey];
   const [values, setValues] = React.useState(defaultValues);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [successMessage, setSuccessMessage] = React.useState("");
+  const [pageData, setPageData] = React.useState<AdsPageDataPayload | null>(null);
+  const [pageDataError, setPageDataError] = React.useState(false);
 
-  useAdsHead(copy);
+  useAdsHead(fallbackCopy, routeKey);
 
-  if (!copy) {
-    return (
-      <SectionWave className="bg-red-50">
-        <div className="mx-auto max-w-3xl px-6 py-16">
-          <GlassCard className="border-red-200 bg-white p-6">
-            <h1 className="text-2xl font-semibold text-red-700">Rota de campanha não configurada</h1>
-            <p className="mt-2 text-sm text-red-700">
-              A rota <code className="font-mono">{routeKey}</code> não possui configuração explícita em ADS_COPIES.
-            </p>
-          </GlassCard>
-        </div>
-      </SectionWave>
-    );
-  }
+  React.useEffect(() => {
+    let mounted = true;
+
+    const loadPageData = async () => {
+      setPageDataError(false);
+      try {
+        const data = await fetchAdsPageData(routeKey);
+        if (!mounted) return;
+        setPageData(data);
+      } catch (fetchError) {
+        console.error("Falha ao carregar conteúdo da rota via /api/page-data", fetchError);
+        if (!mounted) return;
+        setPageData(null);
+        setPageDataError(true);
+      }
+    };
+
+    loadPageData();
+
+    return () => {
+      mounted = false;
+    };
+  }, [routeKey]);
 
   const handleChange = (field: keyof AdsLeadFormValues) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -204,25 +191,30 @@ const AdsLandingPage: React.FC<{ routeKey: AdsRouteKey }> = ({ routeKey }) => {
     }, 1000);
   };
 
+  const displayTitle = pageData?.title || fallbackCopy.h1;
+  const displaySubtitle = pageData?.subtitle || fallbackCopy.subheadline;
+  const displayBullets = pageData?.bullets?.length ? pageData.bullets : fallbackCopy.sectionOneItems;
+  const displayCta = pageData?.cta_text || fallbackCopy.cta;
+
   return (
     <>
       <section className="relative isolate overflow-hidden bg-bgBase px-6 py-16 md:py-20">
         <div className="mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2">
           <GlassCard className="border-white/60 p-7 md:p-10">
             <Badge>Atendimento clínico individual</Badge>
-            <h1 className="mt-4 text-3xl font-bold leading-tight text-neutral-900 md:text-4xl">{copy.h1}</h1>
-            <p className="mt-4 text-base text-neutral-700 md:text-lg">{copy.subheadline}</p>
-            {copy.scarcity && (
-              <p className="mt-4 rounded-xl bg-peach-500/40 px-4 py-3 text-sm font-semibold text-neutral-900">
-                {copy.scarcity}
+            <h1 className="mt-4 text-3xl font-bold leading-tight text-neutral-900 md:text-4xl">{displayTitle}</h1>
+            <p className="mt-4 text-base text-neutral-700 md:text-lg">{displaySubtitle}</p>
+            {pageDataError && (
+              <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+                Conteúdo temporariamente indisponível
               </p>
             )}
             <a href="#form-ads" className="mt-7 inline-flex">
-              <CTAButton label={copy.cta} />
+              <CTAButton label={displayCta} />
             </a>
           </GlassCard>
           <div className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-xl">
-            <img src={copy.heroImage} alt={copy.heroAlt} className="h-auto w-full rounded-2xl" loading="lazy" />
+            <img src={fallbackCopy.heroImage} alt={fallbackCopy.heroAlt} className="h-auto w-full rounded-2xl" loading="lazy" />
           </div>
         </div>
       </section>
@@ -230,9 +222,9 @@ const AdsLandingPage: React.FC<{ routeKey: AdsRouteKey }> = ({ routeKey }) => {
       <SectionWave className="bg-gradient-to-br from-surface-100 via-blush-300/30 to-white">
         <div className="mx-auto grid max-w-6xl gap-6 px-6 md:grid-cols-2">
           <GlassCard className="p-6">
-            <h2 className="text-xl font-semibold text-neutral-900">{copy.sectionOneTitle}</h2>
+            <h2 className="text-xl font-semibold text-neutral-900">{fallbackCopy.sectionOneTitle}</h2>
             <ul className="mt-4 space-y-3">
-              {copy.sectionOneItems.map((item) => (
+              {displayBullets.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-sm text-neutral-700">
                   <span className="icon-circle h-8 w-8 text-sm">✓</span>
                   <span>{item}</span>
@@ -242,14 +234,18 @@ const AdsLandingPage: React.FC<{ routeKey: AdsRouteKey }> = ({ routeKey }) => {
           </GlassCard>
 
           <GlassCard className="p-6">
-            <h2 className="text-xl font-semibold text-neutral-900">{copy.sectionTwoTitle}</h2>
+            <h2 className="text-xl font-semibold text-neutral-900">Perguntas frequentes</h2>
             <ul className="mt-4 space-y-3">
-              {copy.sectionTwoItems.map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm text-neutral-700">
-                  <span className="icon-circle h-8 w-8 text-sm">★</span>
-                  <span>{item}</span>
-                </li>
-              ))}
+              {(pageData?.faq ?? []).length > 0 ? (
+                pageData?.faq.map((item) => (
+                  <li key={item.question} className="rounded-lg border border-neutral-200 p-3 text-sm text-neutral-700">
+                    <p className="font-semibold text-neutral-900">{item.question}</p>
+                    <p className="mt-1">{item.answer}</p>
+                  </li>
+                ))
+              ) : (
+                <li className="text-sm text-neutral-700">Tire suas dúvidas no formulário para receber orientação personalizada.</li>
+              )}
             </ul>
           </GlassCard>
         </div>
@@ -258,7 +254,7 @@ const AdsLandingPage: React.FC<{ routeKey: AdsRouteKey }> = ({ routeKey }) => {
       <SectionWave className="bg-gradient-to-b from-peach-500/30 to-surface-100" id="form-ads">
         <div className="mx-auto max-w-3xl px-6">
           <GlassCard className="p-6 md:p-8">
-            <h2 className="text-2xl font-semibold text-neutral-900">{copy.cta}</h2>
+            <h2 className="text-2xl font-semibold text-neutral-900">{displayCta}</h2>
             <p className="mt-2 text-sm text-neutral-700">Preencha os dados para receber as próximas orientações.</p>
             <form className="mt-6 grid gap-4" onSubmit={submitLead}>
               <input className="rounded-xl border border-neutral-200 px-4 py-3" placeholder="Nome" value={values.nome} onChange={handleChange("nome")} />
@@ -276,7 +272,7 @@ const AdsLandingPage: React.FC<{ routeKey: AdsRouteKey }> = ({ routeKey }) => {
               {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
               {successMessage && <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{successMessage}</p>}
 
-              <CTAButton label={loading ? "Enviando..." : copy.cta} type="submit" disabled={loading} />
+              <CTAButton label={loading ? "Enviando..." : displayCta} type="submit" disabled={loading} />
             </form>
           </GlassCard>
         </div>

@@ -77,7 +77,13 @@ export const getHref = (pageKey: RouteKey, currentLocation: Location = window.lo
 
   const nextUrl = new URL(currentLocation.href);
   nextUrl.pathname = "/";
-  nextUrl.searchParams.set(PAGE_PARAM, pageKey);
+  const queryPageValue =
+    pageKey === "controle_metabolico_barra"
+      ? "controle-metabolico-barra"
+      : pageKey === "consulta_online_controle_peso"
+        ? "consulta-online-controle-peso"
+        : pageKey;
+  nextUrl.searchParams.set(PAGE_PARAM, queryPageValue);
 
   return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 };

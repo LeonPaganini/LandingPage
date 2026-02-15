@@ -23,7 +23,7 @@ test("getCurrentPageKey usa fallback para defaultPage quando page é inválido",
 test("getCurrentPageKey resolve páginas canônicas via query string", () => {
   assert.equal(getCurrentPageKey(buildLocation("?page=calculadora_gordura") as Location), "calculadora_gordura");
   assert.equal(
-    getCurrentPageKey(buildLocation("?page=controle_metabolico_barra") as Location),
+    getCurrentPageKey(buildLocation("?page=controle-metabolico-barra") as Location),
     "controle_metabolico_barra",
   );
 });
@@ -53,7 +53,7 @@ test("getHref preserva UTMs e atualiza somente page", () => {
 
   assert.equal(
     getHref("controle_metabolico_barra", location as Location),
-    "/?utm_source=google&gclid=123&page=controle_metabolico_barra",
+    "/?utm_source=google&gclid=123&page=controle-metabolico-barra",
   );
 });
 

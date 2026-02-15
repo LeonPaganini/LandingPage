@@ -8,8 +8,15 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 const SPREADSHEET_ID = "1SwN3j3l7MRs57knGUey616wS7_V3pmE2QCKsrbRRBy4";
 const SHEET_RANGE = "Leads!A:Q";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+const READONLY_SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+const PAGE_DATA_TIMEOUT_MS = 8_000;
+const PAGE_DATA_CACHE_TTL_MS = 60_000;
+const ALLOWED_PAGE_SLUGS = new Set(["consulta-online-controle-peso", "controle-metabolico-barra"]);
+const PAGE_FIELDS = ["slug", "title", "subtitle", "hero_text", "bullets", "cta_text", "cta_link", "faq_json", "updated_at"];
 
 let sheetsClient;
+let pageSheetsClient;
+const pageCache = new Map();
 
 const STATIC_DIR = process.env.STATIC_DIR ?? "dist";
 const MIME_TYPES = {
@@ -59,6 +66,186 @@ const getSheetsClient = () => {
   return sheetsClient;
 };
 
+const loadServiceAccountFromEnv = () => {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!raw) {
+    throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON não configurado.");
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      ...parsed,
+      private_key: typeof parsed.private_key === "string" ? parsed.private_key.replace(/\\n/g, "\n") : parsed.private_key,
+    };
+  } catch {
+    throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON inválido.");
+  }
+};
+
+const getPageSheetsClient = () => {
+  if (!pageSheetsClient) {
+    const credentials = loadServiceAccountFromEnv();
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: [READONLY_SCOPES],
+    });
+
+    pageSheetsClient = google.sheets({ version: "v4", auth });
+  }
+
+  return pageSheetsClient;
+};
+
+const withTimeout = (promise, timeoutMs, timeoutMessage) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+    }),
+  ]);
+
+const parseBullets = (raw) => {
+  if (typeof raw !== "string") return [];
+  return raw
+    .replace(/\\n/g, "\n")
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const parseFaqJson = (raw) => {
+  if (typeof raw !== "string" || !raw.trim()) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((item) => {
+        if (!item || typeof item !== "object") return null;
+        const question = typeof item.question === "string" ? item.question.trim() : "";
+        const answer = typeof item.answer === "string" ? item.answer.trim() : "";
+        if (!question || !answer) return null;
+        return { question, answer };
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+};
+
+const normalizePagePayload = (rawData) => ({
+  slug: rawData.slug,
+  title: typeof rawData.title === "string" ? rawData.title : "",
+  subtitle: typeof rawData.subtitle === "string" ? rawData.subtitle : "",
+  hero_text: typeof rawData.hero_text === "string" ? rawData.hero_text : "",
+  bullets: parseBullets(rawData.bullets),
+  cta_text: typeof rawData.cta_text === "string" ? rawData.cta_text : "",
+  cta_link: typeof rawData.cta_link === "string" ? rawData.cta_link : "",
+  faq: parseFaqJson(rawData.faq_json),
+  updated_at: typeof rawData.updated_at === "string" ? rawData.updated_at : "",
+});
+
+const getPageSpreadsheetId = () => {
+  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+  if (!spreadsheetId) {
+    throw new Error("GOOGLE_SHEETS_ID não configurado.");
+  }
+
+  return spreadsheetId;
+};
+
+const fetchPageFromPagesTab = async (slug) => {
+  const sheets = getPageSheetsClient();
+  const response = await withTimeout(
+    sheets.spreadsheets.values.get({
+      spreadsheetId: getPageSpreadsheetId(),
+      range: "pages!A:I",
+    }),
+    PAGE_DATA_TIMEOUT_MS,
+    "Timeout ao consultar aba pages.",
+  );
+
+  const rows = response?.data?.values ?? [];
+  if (rows.length === 0) return null;
+
+  const dataRows = rows.slice(1);
+  const matched = dataRows.find((row) => normalizePageValue(row?.[0]) === slug);
+  if (!matched) return null;
+
+  const rawData = PAGE_FIELDS.reduce((acc, key, index) => {
+    acc[key] = matched[index] ?? "";
+    return acc;
+  }, {});
+
+  return normalizePagePayload(rawData);
+};
+
+const fetchPageFromSlugTab = async (slug) => {
+  const sheets = getPageSheetsClient();
+  const response = await withTimeout(
+    sheets.spreadsheets.values.get({
+      spreadsheetId: getPageSpreadsheetId(),
+      range: `${slug}!A:B`,
+    }),
+    PAGE_DATA_TIMEOUT_MS,
+    `Timeout ao consultar aba ${slug}.`,
+  );
+
+  const rows = response?.data?.values ?? [];
+  if (rows.length === 0) return null;
+
+  const rawData = rows.reduce(
+    (acc, row) => {
+      const key = normalizePageValue(row?.[0]);
+      if (!key || !PAGE_FIELDS.includes(key)) return acc;
+      acc[key] = row?.[1] ?? "";
+      return acc;
+    },
+    { slug },
+  );
+
+  return normalizePagePayload(rawData);
+};
+
+const resolvePageData = async (slug) => {
+  const cached = pageCache.get(slug);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.payload;
+  }
+
+  let pagesTabError = null;
+  let payload = null;
+
+  try {
+    payload = await fetchPageFromPagesTab(slug);
+  } catch (error) {
+    pagesTabError = error;
+    console.warn("Falha ao ler aba pages; tentando fallback por aba individual", error?.message || error);
+  }
+
+  if (!payload) {
+    try {
+      payload = await fetchPageFromSlugTab(slug);
+    } catch (fallbackError) {
+      const detail = fallbackError?.message || pagesTabError?.message || "Falha na leitura da planilha.";
+      throw new Error(detail);
+    }
+  }
+
+  if (!payload) {
+    throw new Error("Conteúdo não encontrado na planilha para o slug informado.");
+  }
+
+  pageCache.set(slug, {
+    payload,
+    expiresAt: Date.now() + PAGE_DATA_CACHE_TTL_MS,
+  });
+
+  return payload;
+};
+
 const appendLeadToSheet = async (values) => {
   const sheets = getSheetsClient();
   await sheets.spreadsheets.values.append({
@@ -89,6 +276,12 @@ const parseJsonBody = (req) =>
     });
     req.on("error", reject);
   });
+
+const normalizePageValue = (value) => {
+  const raw = typeof value === "string" ? value.trim().toLowerCase() : "";
+  if (!raw) return "";
+  return raw.replace(/^\/+|\/+$/g, "");
+};
 
 const sendJson = (res, status, payload) => {
   res.statusCode = status;
@@ -188,6 +381,30 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "GET" && url.pathname === "/health") {
     sendJson(res, 200, { status: "ok" });
+    return;
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/page-data") {
+    const slug = normalizePageValue(url.searchParams.get("page"));
+
+    if (!ALLOWED_PAGE_SLUGS.has(slug)) {
+      sendJson(res, 400, {
+        error: "Parâmetro 'page' inválido.",
+        detail: "Use um slug permitido.",
+      });
+      return;
+    }
+
+    try {
+      const payload = await resolvePageData(slug);
+      sendJson(res, 200, payload);
+    } catch (error) {
+      console.error("Falha ao carregar page-data", error?.message || error);
+      sendJson(res, 502, {
+        error: "Falha ao consultar Google Sheets.",
+        detail: error?.message || "Erro desconhecido.",
+      });
+    }
     return;
   }
 
