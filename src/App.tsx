@@ -14,6 +14,7 @@ import BodyFatCalculator from "./Calculator";
 import ResetNutricionalPage from "./ResetNutricional.js";
 import LinkBio from "./LinkBio.js";
 import EbooksPage from "./Ebooks.js";
+import AdsLandingPage from "./AdsLandingPage";
 import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
 import {
   RouteKey,
@@ -556,6 +557,16 @@ const App: React.FC = () => {
     setActivePage("link-bio");
   }, []);
 
+  const navigateToControleMetabolicoBarra = React.useCallback(() => {
+    navigateToRoute("controle-metabolico-barra");
+    setActivePage("controle-metabolico-barra");
+  }, []);
+
+  const navigateToConsultaOnlineControlePeso = React.useCallback(() => {
+    navigateToRoute("consulta-online-controle-peso");
+    setActivePage("consulta-online-controle-peso");
+  }, []);
+
   const navigateHome = React.useCallback(() => {
     navigateToRoute("home");
     setActivePage("home");
@@ -593,13 +604,27 @@ const App: React.FC = () => {
         case "link-bio":
           navigateToLinkBio();
           return;
+        case "controle-metabolico-barra":
+          navigateToControleMetabolicoBarra();
+          return;
+        case "consulta-online-controle-peso":
+          navigateToConsultaOnlineControlePeso();
+          return;
         case "home":
         default:
           navigateHome();
           return;
       }
     },
-    [navigateHome, navigateToCalculator, navigateToEbooks, navigateToLinkBio, navigateToReset],
+    [
+      navigateHome,
+      navigateToCalculator,
+      navigateToConsultaOnlineControlePeso,
+      navigateToControleMetabolicoBarra,
+      navigateToEbooks,
+      navigateToLinkBio,
+      navigateToReset,
+    ],
   );
 
   return (
@@ -642,6 +667,8 @@ const App: React.FC = () => {
         />
       )}
       {activePage === "reset-nutricional" && <ResetNutricionalPage onNavigateHome={navigateHome} />}
+      {activePage === "controle-metabolico-barra" && <AdsLandingPage routeKey="controle-metabolico-barra" />}
+      {activePage === "consulta-online-controle-peso" && <AdsLandingPage routeKey="consulta-online-controle-peso" />}
       <Footer />
     </main>
   );

@@ -1,4 +1,11 @@
-export type RouteKey = "home" | "calculator" | "reset-nutricional" | "link-bio" | "ebooks";
+export type RouteKey =
+  | "home"
+  | "calculator"
+  | "reset-nutricional"
+  | "link-bio"
+  | "ebooks"
+  | "controle-metabolico-barra"
+  | "consulta-online-controle-peso";
 
 const PAGE_PARAM = "page";
 
@@ -18,6 +25,8 @@ const pageParamRoutes: Record<string, RouteKey> = {
   "link-bio": "link-bio",
   "link_bio": "link-bio",
   ebooks: "ebooks",
+  "controle-metabolico-barra": "controle-metabolico-barra",
+  "consulta-online-controle-peso": "consulta-online-controle-peso",
   home: "home",
 };
 
@@ -27,6 +36,8 @@ const pathRoutes: Record<string, RouteKey> = {
   "/link-bio": "link-bio",
   "/link_bio": "link-bio",
   "/ebooks": "ebooks",
+  "/controle-metabolico-barra": "controle-metabolico-barra",
+  "/consulta-online-controle-peso": "consulta-online-controle-peso",
 };
 
 export const resolveRoute = (locationLike: Location): RouteKey => {
@@ -65,6 +76,14 @@ export const buildUrlForRoute = (route: RouteKey, currentLocation: Location = wi
     case "ebooks":
       url.pathname = "/";
       url.searchParams.set(PAGE_PARAM, "ebooks");
+      break;
+    case "controle-metabolico-barra":
+      url.pathname = "/controle-metabolico-barra";
+      url.searchParams.delete(PAGE_PARAM);
+      break;
+    case "consulta-online-controle-peso":
+      url.pathname = "/consulta-online-controle-peso";
+      url.searchParams.delete(PAGE_PARAM);
       break;
     case "home":
     default:
