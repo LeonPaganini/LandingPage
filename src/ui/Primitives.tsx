@@ -18,7 +18,8 @@ export const CTAButton: React.FC<{
   href?: string;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
-}> = ({ label, href, onClick, type = "button" }) => {
+  disabled?: boolean;
+}> = ({ label, href, onClick, type = "button", disabled = false }) => {
   const handleClick = (
     event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
   ) => {
@@ -37,7 +38,7 @@ export const CTAButton: React.FC<{
   }
 
   return (
-    <button type={type} className="button-primary" onClick={onClick}>
+    <button type={type} className="button-primary disabled:cursor-not-allowed disabled:opacity-70" onClick={onClick} disabled={disabled}>
       {label}
     </button>
   );

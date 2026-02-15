@@ -10,6 +10,23 @@ import gspread
 logger = logging.getLogger(__name__)
 
 SHEET_HEADERS = ["Nome", "Telefone", "Sexo", "Resultado", "DataHora", "Origem"]
+ADS_SHEET_HEADERS = [
+    "Nome",
+    "Email",
+    "WhatsApp",
+    "Idade",
+    "ObjetivoPrincipal",
+    "DisposicaoInvestimento",
+    "OrigemRota",
+    "UTMSource",
+    "UTMCampaign",
+    "UTMTerm",
+    "UTMMedium",
+    "UTMContent",
+    "Timestamp",
+    "DataHora",
+    "Origem",
+]
 SAO_PAULO_TZ = ZoneInfo("America/Sao_Paulo")
 
 
@@ -88,6 +105,49 @@ class GoogleSheetsService:
             worksheet.append_row(row, value_input_option="USER_ENTERED")
         except Exception as exc:  # noqa: BLE001
             raise RuntimeError("Failed to append lead to Google Sheets") from exc
+
+    def append_ads_lead(
+        self,
+        *,
+        nome: str,
+        email: str,
+        whatsapp: str,
+        idade: int,
+        objetivo_principal: str,
+        disposicao_investimento: str,
+        origem_rota: str,
+        utm_source: str,
+        utm_campaign: str,
+        utm_term: str,
+        utm_medium: str,
+        utm_content: str,
+        timestamp: str,
+    ):
+        worksheet = self._get_worksheet()
+        now = _current_timestamp()
+
+        row = [
+            nome,
+            email,
+            whatsapp,
+            idade,
+            objetivo_principal,
+            disposicao_investimento,
+            origem_rota,
+            utm_source,
+            utm_campaign,
+            utm_term,
+            utm_medium,
+            utm_content,
+            timestamp,
+            now,
+            "AdsPerformance",
+        ]
+
+        try:
+            worksheet.append_row(row, value_input_option="USER_ENTERED")
+        except Exception as exc:  # noqa: BLE001
+            raise RuntimeError("Failed to append ads lead to Google Sheets") from exc
 
 
 @lru_cache

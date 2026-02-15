@@ -6,7 +6,7 @@ import { google } from "googleapis";
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 const SPREADSHEET_ID = "1SwN3j3l7MRs57knGUey616wS7_V3pmE2QCKsrbRRBy4";
-const SHEET_RANGE = "Leads!A:D";
+const SHEET_RANGE = "Leads!A:Q";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
 let sheetsClient;
@@ -121,6 +121,47 @@ const validateLead = ({ nome, telefone, sexo, resultado }) => {
   return { errors, normalized: { nome: trimmedName, telefone, sexo: normalizedSexo, resultado: parsedResultado } };
 };
 
+
+
+const validateAdsLead = (payload) => {
+  const errors = [];
+  const nome = typeof payload.nome === "string" ? payload.nome.trim() : "";
+  const email = typeof payload.email === "string" ? payload.email.trim() : "";
+  const whatsapp = typeof payload.whatsapp === "string" ? payload.whatsapp.replace(/\D/g, "") : "";
+  const idade = Number(payload.idade);
+  const objetivo = typeof payload.objetivo_principal === "string" ? payload.objetivo_principal.trim() : "";
+  const investimento =
+    typeof payload.disposicao_investimento === "string" ? payload.disposicao_investimento.trim() : "";
+  const origem = typeof payload.origem_rota === "string" ? payload.origem_rota.trim() : "";
+
+  if (nome.length < 3) errors.push("nome deve ter ao menos 3 caracteres.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push("email inválido.");
+  if (whatsapp.length < 10 || whatsapp.length > 13) errors.push("whatsapp inválido.");
+  if (!Number.isInteger(idade) || idade < 18 || idade > 70) errors.push("idade deve ser entre 18 e 70.");
+  if (!objetivo) errors.push("objetivo_principal é obrigatório.");
+  if (!investimento) errors.push("disposicao_investimento é obrigatório.");
+  if (!origem) errors.push("origem_rota é obrigatória.");
+
+  return {
+    errors,
+    normalized: {
+      nome,
+      email,
+      whatsapp,
+      idade,
+      objetivo_principal: objetivo,
+      disposicao_investimento: investimento,
+      origem_rota: origem,
+      utm_source: payload.utm_source ?? "",
+      utm_campaign: payload.utm_campaign ?? "",
+      utm_term: payload.utm_term ?? "",
+      utm_medium: payload.utm_medium ?? "",
+      utm_content: payload.utm_content ?? "",
+      timestamp: payload.timestamp ?? new Date().toISOString(),
+    },
+  };
+};
+
 const serveFile = (res, absolutePath) => {
   if (!existsSync(absolutePath)) return false;
 
@@ -170,6 +211,47 @@ const server = http.createServer(async (req, res) => {
       sendJson(res, 201, { status: "ok" });
     } catch (error) {
       console.error("Falha ao salvar lead no Google Sheets", error?.message || error);
+      sendJson(res, 500, { error: "Não foi possível registrar o lead." });
+    }
+    return;
+  }
+
+
+
+  if (req.method === "POST" && url.pathname === "/api/leads/ads-performance") {
+    let body;
+    try {
+      body = await parseJsonBody(req);
+    } catch (error) {
+      sendJson(res, 400, { error: error.message });
+      return;
+    }
+
+    const { errors, normalized } = validateAdsLead(body ?? {});
+    if (errors.length > 0) {
+      sendJson(res, 400, { error: "Payload inválido.", detalhes: errors });
+      return;
+    }
+
+    try {
+      await appendLeadToSheet([[
+        normalized.nome,
+        normalized.email,
+        normalized.whatsapp,
+        normalized.idade,
+        normalized.objetivo_principal,
+        normalized.disposicao_investimento,
+        normalized.origem_rota,
+        normalized.utm_source,
+        normalized.utm_campaign,
+        normalized.utm_term,
+        normalized.utm_medium,
+        normalized.utm_content,
+        normalized.timestamp,
+      ]]);
+      sendJson(res, 201, { status: "ok" });
+    } catch (error) {
+      console.error("Falha ao salvar lead Ads", error?.message || error);
       sendJson(res, 500, { error: "Não foi possível registrar o lead." });
     }
     return;
