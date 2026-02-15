@@ -50,3 +50,57 @@ Para evitar 404 em acesso direto/refresh, configure no Render:
   - Type: `Rewrite`
 
 Referência: documentação de Redirects/Rewrites do Render.
+
+
+## Conteúdo dinâmico das páginas de Ads via Google Sheets
+As páginas abaixo continuam roteadas **somente por query string**:
+- `/?page=consulta-online-controle-peso`
+- `/?page=controle-metabolico-barra`
+
+O frontend busca conteúdo no endpoint interno:
+- `GET /api/page-data?page=<slug>`
+
+### Backend (`/api/page-data`)
+Implementado em `server.js`, com:
+- whitelist estrita de slug permitido;
+- timeout de 8s na leitura do Google Sheets;
+- cache em memória por 60s por slug;
+- fallback de leitura:
+  1. aba `pages` (`pages!A:I`), com colunas: `slug,title,subtitle,hero_text,bullets,cta_text,cta_link,faq_json,updated_at`;
+  2. aba por slug (`<slug>!A:B`) em formato chave-valor.
+
+Erros do Sheets retornam `502` com JSON `{ error, detail }` e slug inválido retorna `400`.
+
+### Variáveis de ambiente obrigatórias (backend)
+- `GOOGLE_SERVICE_ACCOUNT_JSON`: JSON completo da service account em string;
+- `GOOGLE_SHEETS_ID`: ID da planilha com os dados de conteúdo.
+
+### Setup Google Service Account
+1. Crie uma Service Account no Google Cloud e habilite a Google Sheets API.
+2. Gere a chave JSON da Service Account.
+3. Configure `GOOGLE_SERVICE_ACCOUNT_JSON` com o JSON completo (incluindo `private_key`).
+4. Compartilhe a planilha com o e-mail da Service Account com acesso de leitura.
+5. Configure `GOOGLE_SHEETS_ID` com o ID da planilha.
+
+### Exemplo de resposta `GET /api/page-data?page=consulta-online-controle-peso`
+```json
+{
+  "slug": "consulta-online-controle-peso",
+  "title": "Consulta nutricional online para controle de peso",
+  "subtitle": "Atendimento individual com retorno em 45 dias.",
+  "hero_text": "Plano personalizado com acompanhamento.",
+  "bullets": [
+    "Plano individualizado",
+    "Retorno estruturado em 45 dias"
+  ],
+  "cta_text": "Solicitar consulta online",
+  "cta_link": "https://wa.me/5511999999999",
+  "faq": [
+    {
+      "question": "Como funciona o retorno?",
+      "answer": "Você recebe reavaliação e ajustes em até 45 dias."
+    }
+  ],
+  "updated_at": "2026-01-20T10:30:00.000Z"
+}
+```

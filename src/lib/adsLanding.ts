@@ -1,6 +1,7 @@
 import { WHATSAPP_NUMBER } from "../config/whatsapp";
 
 export type AdsRouteKey = "controle_metabolico_barra" | "consulta_online_controle_peso";
+export type AdsRouteSlug = "controle-metabolico-barra" | "consulta-online-controle-peso";
 
 export type AdsLeadFormValues = {
   nome: string;
@@ -27,17 +28,36 @@ export type AdsLeadPayload = {
   timestamp: string;
 };
 
+export type AdsPageDataPayload = {
+  slug: AdsRouteSlug;
+  title: string;
+  subtitle: string;
+  hero_text: string;
+  bullets: string[];
+  cta_text: string;
+  cta_link: string;
+  faq: Array<{ question: string; answer: string }>;
+  updated_at: string;
+};
+
+export const ADS_ROUTE_SLUG: Record<AdsRouteKey, AdsRouteSlug> = {
+  controle_metabolico_barra: "controle-metabolico-barra",
+  consulta_online_controle_peso: "consulta-online-controle-peso",
+};
+
 export const ADS_ROUTE_META: Record<
   AdsRouteKey,
   {
     origin: "presencial" | "online";
     conversionEvent: "conversion_presencial" | "conversion_online";
     pageKey: AdsRouteKey;
+    pageSlug: AdsRouteSlug;
     whatsappTemplate: (goal: string) => string;
   }
 > = {
   controle_metabolico_barra: {
     pageKey: "controle_metabolico_barra",
+    pageSlug: ADS_ROUTE_SLUG.controle_metabolico_barra,
     origin: "presencial",
     conversionEvent: "conversion_presencial",
     whatsappTemplate: (goal) =>
@@ -45,6 +65,7 @@ export const ADS_ROUTE_META: Record<
   },
   consulta_online_controle_peso: {
     pageKey: "consulta_online_controle_peso",
+    pageSlug: ADS_ROUTE_SLUG.consulta_online_controle_peso,
     origin: "online",
     conversionEvent: "conversion_online",
     whatsappTemplate: (goal) =>
@@ -105,14 +126,28 @@ const resolveBackendBaseUrl = () => {
     (import.meta.env.BACKEND_BASE_URL as string | undefined) ??
     (import.meta.env.VITE_LEADS_API_URL as string | undefined) ??
     (import.meta.env.NEXT_PUBLIC_LEADS_API_URL as string | undefined) ??
-    "https://landing-leads.onrender.com";
+    "";
 
   return base.replace(/\/$/, "");
 };
 
+export const fetchAdsPageData = async (route: AdsRouteKey): Promise<AdsPageDataPayload> => {
+  const slug = ADS_ROUTE_SLUG[route];
+  const base = resolveBackendBaseUrl();
+  const endpoint = `${base}/api/page-data?page=${encodeURIComponent(slug)}`;
+
+  const response = await fetch(endpoint);
+  if (!response.ok) {
+    throw new Error(`Falha ao carregar conteúdo dinâmico (${response.status}).`);
+  }
+
+  return (await response.json()) as AdsPageDataPayload;
+};
+
 export const submitAdsLead = async (payload: AdsLeadPayload): Promise<boolean> => {
   try {
-    const response = await fetch(`${resolveBackendBaseUrl()}/api/leads/ads-performance`, {
+    const base = resolveBackendBaseUrl();
+    const response = await fetch(`${base}/api/leads/ads-performance`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

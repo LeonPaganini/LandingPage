@@ -596,7 +596,13 @@ const App: React.FC = () => {
       document.head.appendChild(canonical);
     }
 
-    canonical.setAttribute("href", `${window.location.origin}/?page=${currentPageKey}`);
+    const canonicalPage =
+      currentPageKey === "controle_metabolico_barra"
+        ? "controle-metabolico-barra"
+        : currentPageKey === "consulta_online_controle_peso"
+          ? "consulta-online-controle-peso"
+          : currentPageKey;
+    canonical.setAttribute("href", `${window.location.origin}/?page=${canonicalPage}`);
   }, [currentPageKey]);
 
   const handleInternalRoute = React.useCallback(
