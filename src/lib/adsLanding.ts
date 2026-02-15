@@ -144,5 +144,5 @@ export const buildWhatsAppRedirectUrl = (route: AdsRouteKey, goal: string, name:
   const normalizedPhone = WHATSAPP_NUMBER.replace(/\D/g, "");
   const introGoal = goal.trim() || "Não informado";
   const personalizedMessage = `${ADS_ROUTE_META[route].whatsappTemplate(introGoal)}\nNome: ${name.trim() || "Não informado"}`;
-  return `https://api.whatsapp.com/send?phone=${normalizedPhone}&text=${encodeURIComponent(personalizedMessage)}`;
+  return `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(personalizedMessage)}`;
 };
