@@ -32,6 +32,7 @@ const pageParamRoutes: Record<string, RouteKey> = {
 
 const pathRoutes: Record<string, RouteKey> = {
   "/": "home",
+  "/calculadora-gordura": "calculator",
   "/reset-nutricional": "reset-nutricional",
   "/link-bio": "link-bio",
   "/link_bio": "link-bio",
@@ -62,20 +63,20 @@ export const buildUrlForRoute = (route: RouteKey, currentLocation: Location = wi
 
   switch (route) {
     case "calculator":
-      url.pathname = "/";
-      url.searchParams.set(PAGE_PARAM, "calculadora_gordura");
+      url.pathname = "/calculadora-gordura";
+      url.searchParams.delete(PAGE_PARAM);
       break;
     case "reset-nutricional":
-      url.pathname = "/";
-      url.searchParams.set(PAGE_PARAM, "reset_nutricional");
+      url.pathname = "/reset-nutricional";
+      url.searchParams.delete(PAGE_PARAM);
       break;
     case "link-bio":
-      url.pathname = "/";
-      url.searchParams.set(PAGE_PARAM, "link_bio");
+      url.pathname = "/link-bio";
+      url.searchParams.delete(PAGE_PARAM);
       break;
     case "ebooks":
-      url.pathname = "/";
-      url.searchParams.set(PAGE_PARAM, "ebooks");
+      url.pathname = "/ebooks";
+      url.searchParams.delete(PAGE_PARAM);
       break;
     case "controle-metabolico-barra":
       url.pathname = "/controle-metabolico-barra";
