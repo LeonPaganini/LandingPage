@@ -55,6 +55,13 @@ Se o deploy for como **Static Site** no Render, configure no painel:
 
 Sem essa regra, ao abrir diretamente uma rota interna (ex.: `/ebooks`) o host retorna 404.
 
+### Render SPA Rewrite
+Regra necessária para evitar 404 em refresh/acesso direto das rotas da SPA:
+
+| Source | Destination | Type |
+| --- | --- | --- |
+| `/*` | `/index.html` | `Rewrite` |
+
 Essas rotas usam `noindex, nofollow`, canonical próprio e formulário conectado ao endpoint existente de leads.
 
 ## Variáveis de ambiente
