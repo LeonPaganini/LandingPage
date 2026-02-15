@@ -33,7 +33,7 @@ const ADS_COPIES: Record<AdsRouteKey, LandingCopy> = {
     title: "Nutricionista na Barra da Tijuca | Controle metabólico feminino",
     description:
       "Atendimento clínico individual no Shopping Downtown para mulheres com dificuldade de emagrecimento e sintomas metabólicos persistentes.",
-    canonicalPath: "/controle-metabolico-barra",
+    canonicalPath: "/?page=controle-metabolico-barra",
     h1: "Nutricionista na Barra da Tijuca para controle de peso e saúde metabólica feminina",
     subheadline:
       "Atendimento clínico individual no Shopping Downtown para mulheres com dificuldade de emagrecimento e sintomas metabólicos persistentes.",
@@ -63,7 +63,7 @@ const ADS_COPIES: Record<AdsRouteKey, LandingCopy> = {
     title: "Consulta nutricional online | Controle de peso e metabolismo",
     description:
       "Atendimento individual com retorno estruturado em 45 dias para ajuste de estratégia.",
-    canonicalPath: "/consulta-online-controle-peso",
+    canonicalPath: "/?page=consulta-online-controle-peso",
     h1: "Consulta nutricional online para controle de peso e organização metabólica",
     subheadline: "Atendimento individual com retorno estruturado em 45 dias para ajuste de estratégia.",
     cta: "Solicitar consulta online",
