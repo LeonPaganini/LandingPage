@@ -19,6 +19,36 @@ Landing page em **React + TypeScript com Vite e TailwindCSS**.
 - `/controle-metabolico-barra`
 - `/consulta-online-controle-peso`
 
+## Rotas SPA e prevenção de 404 em produção
+
+Esta aplicação é uma SPA Vite e usa roteamento no cliente. Sem fallback de rewrite no host, qualquer acesso direto em rotas internas retorna 404.
+
+Rotas suportadas por `pathname`:
+- `/`
+- `/calculadora-gordura`
+- `/reset-nutricional`
+- `/link-bio`
+- `/ebooks`
+- `/controle-metabolico-barra`
+- `/consulta-online-controle-peso`
+
+Compatibilidade legada via query string (`?page=`) continua ativa para links antigos.
+
+### Vercel
+- O projeto inclui `vercel.json` com rewrite global para `/index.html`.
+- Isso garante que acesso direto/refresh em qualquer rota SPA não gere 404.
+
+### Render (Static Site)
+Se o deploy for como **Static Site** no Render, configure no painel:
+1. **Build Command**: `npm ci && npm run build`
+2. **Publish Directory**: `dist`
+3. Em **Redirects/Rewrites**, adicione regra de fallback SPA:
+   - Source: `/*`
+   - Destination: `/index.html`
+   - Action/Type: `Rewrite`
+
+Sem essa regra, ao abrir diretamente uma rota interna (ex.: `/ebooks`) o host retorna 404.
+
 Essas rotas usam `noindex, nofollow`, canonical próprio e formulário conectado ao endpoint existente de leads.
 
 ## Variáveis de ambiente
