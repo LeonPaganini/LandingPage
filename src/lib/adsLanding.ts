@@ -1,6 +1,6 @@
 import { WHATSAPP_NUMBER } from "../config/whatsapp";
 
-export type AdsRouteKey = "controle-metabolico-barra" | "consulta-online-controle-peso";
+export type AdsRouteKey = "controle_metabolico_barra" | "consulta_online_controle_peso";
 
 export type AdsLeadFormValues = {
   nome: string;
@@ -30,21 +30,21 @@ export type AdsLeadPayload = {
 export const ADS_ROUTE_META: Record<
   AdsRouteKey,
   {
-    pathname: string;
     origin: "presencial" | "online";
     conversionEvent: "conversion_presencial" | "conversion_online";
+    pageKey: AdsRouteKey;
     whatsappTemplate: (goal: string) => string;
   }
 > = {
-  "controle-metabolico-barra": {
-    pathname: "/controle-metabolico-barra",
+  controle_metabolico_barra: {
+    pageKey: "controle_metabolico_barra",
     origin: "presencial",
     conversionEvent: "conversion_presencial",
     whatsappTemplate: (goal) =>
       `Olá, Thais. Acabei de preencher o formulário para avaliação PRESENCIAL na Barra da Tijuca (Shopping Downtown). Meu objetivo principal é: ${goal}. Quero organizar meu controle de peso e saúde metabólica.`,
   },
-  "consulta-online-controle-peso": {
-    pathname: "/consulta-online-controle-peso",
+  consulta_online_controle_peso: {
+    pageKey: "consulta_online_controle_peso",
     origin: "online",
     conversionEvent: "conversion_online",
     whatsappTemplate: (goal) =>

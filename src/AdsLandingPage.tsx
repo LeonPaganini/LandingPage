@@ -29,11 +29,11 @@ type LandingCopy = {
 };
 
 const ADS_COPIES: Record<AdsRouteKey, LandingCopy> = {
-  "controle-metabolico-barra": {
+  controle_metabolico_barra: {
     title: "Nutricionista na Barra da Tijuca | Controle metabólico feminino",
     description:
       "Atendimento clínico individual no Shopping Downtown para mulheres com dificuldade de emagrecimento e sintomas metabólicos persistentes.",
-    canonicalPath: "/?page=controle-metabolico-barra",
+    canonicalPath: "/?page=controle_metabolico_barra",
     h1: "Nutricionista na Barra da Tijuca para controle de peso e saúde metabólica feminina",
     subheadline:
       "Atendimento clínico individual no Shopping Downtown para mulheres com dificuldade de emagrecimento e sintomas metabólicos persistentes.",
@@ -59,11 +59,11 @@ const ADS_COPIES: Record<AdsRouteKey, LandingCopy> = {
     ],
     scarcity: "Apenas 4 vagas presenciais por semana.",
   },
-  "consulta-online-controle-peso": {
+  consulta_online_controle_peso: {
     title: "Consulta nutricional online | Controle de peso e metabolismo",
     description:
       "Atendimento individual com retorno estruturado em 45 dias para ajuste de estratégia.",
-    canonicalPath: "/?page=consulta-online-controle-peso",
+    canonicalPath: "/?page=consulta_online_controle_peso",
     h1: "Consulta nutricional online para controle de peso e organização metabólica",
     subheadline: "Atendimento individual com retorno estruturado em 45 dias para ajuste de estratégia.",
     cta: "Solicitar consulta online",
@@ -192,7 +192,7 @@ const AdsLandingPage: React.FC<{ routeKey: AdsRouteKey }> = ({ routeKey }) => {
     }
 
     triggerConversionEvent(ADS_ROUTE_META[routeKey].conversionEvent, {
-      route: ADS_ROUTE_META[routeKey].pathname,
+      route: ADS_ROUTE_META[routeKey].pageKey,
       origem: payload.origem_rota,
       utm_campaign: payload.utm_campaign,
     });

@@ -16,13 +16,8 @@ import LinkBio from "./LinkBio.js";
 import EbooksPage from "./Ebooks.js";
 import AdsLandingPage from "./AdsLandingPage";
 import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./ui/Primitives.js";
-import {
-  RouteKey,
-  getRouteHref,
-  navigateToRoute,
-  normalizeAndResolveRoute,
-  resolveRouteFromString,
-} from "./lib/router.js";
+import { getCurrentPageKey, getHref, navigateTo, resolvePageKeyFromString } from "./lib/queryRouter.js";
+import { ROUTES, RouteKey } from "./lib/routes.js";
 import { LINK_BIO_HERO, LINK_BIO_PROFILE } from "./data/linkBioConfig";
 import {
   getWhatsappHrefForCta,
@@ -511,10 +506,10 @@ const LandingContent: React.FC<{
 );
 
 const App: React.FC = () => {
-  const [activePage, setActivePage] = React.useState<RouteKey>(() => normalizeAndResolveRoute());
+  const [currentPageKey, setCurrentPageKey] = React.useState<RouteKey>(() => getCurrentPageKey());
 
   const syncRouteFromLocation = React.useCallback(() => {
-    setActivePage(normalizeAndResolveRoute());
+    setCurrentPageKey(getCurrentPageKey());
   }, []);
 
   React.useEffect(() => {
@@ -530,84 +525,101 @@ const App: React.FC = () => {
 
   const routeHrefs = React.useMemo(
     () => ({
-      calculator: getRouteHref("calculator"),
-      reset: getRouteHref("reset-nutricional"),
-      ebooks: getRouteHref("ebooks"),
+      calculator: getHref("calculadora_gordura"),
+      reset: getHref("reset_nutricional"),
+      ebooks: getHref("ebooks"),
     }),
-    [activePage],
+    [currentPageKey],
   );
 
   const navigateToCalculator = React.useCallback(() => {
-    navigateToRoute("calculator");
-    setActivePage("calculator");
+    navigateTo("calculadora_gordura");
   }, []);
 
   const navigateToReset = React.useCallback(() => {
-    navigateToRoute("reset-nutricional");
-    setActivePage("reset-nutricional");
+    navigateTo("reset_nutricional");
   }, []);
 
   const navigateToEbooks = React.useCallback(() => {
-    navigateToRoute("ebooks");
-    setActivePage("ebooks");
+    navigateTo("ebooks");
   }, []);
 
   const navigateToLinkBio = React.useCallback(() => {
-    navigateToRoute("link-bio");
-    setActivePage("link-bio");
+    navigateTo("link_bio");
   }, []);
 
   const navigateToControleMetabolicoBarra = React.useCallback(() => {
-    navigateToRoute("controle-metabolico-barra");
-    setActivePage("controle-metabolico-barra");
+    navigateTo("controle_metabolico_barra");
   }, []);
 
   const navigateToConsultaOnlineControlePeso = React.useCallback(() => {
-    navigateToRoute("consulta-online-controle-peso");
-    setActivePage("consulta-online-controle-peso");
+    navigateTo("consulta_online_controle_peso");
   }, []);
 
   const navigateHome = React.useCallback(() => {
-    navigateToRoute("home");
-    setActivePage("home");
+    navigateTo("home");
   }, []);
 
   const getWhatsappHref = React.useCallback(
-    (label: string) => getWhatsappHrefForCta(label, activePage),
-    [activePage],
+    (label: string) => getWhatsappHrefForCta(label, currentPageKey),
+    [currentPageKey],
   );
 
   const handleWhatsappClick = React.useCallback(
-    (label: string) => openWhatsappForCta(label, activePage),
-    [activePage],
+    (label: string) => openWhatsappForCta(label, currentPageKey),
+    [currentPageKey],
   );
 
   const isWhatsappCta = React.useCallback(
-    (label: string) => hasWhatsappMessageForCta(label, activePage),
-    [activePage],
+    (label: string) => hasWhatsappMessageForCta(label, currentPageKey),
+    [currentPageKey],
   );
+
+  React.useEffect(() => {
+    const routeConfig = ROUTES[currentPageKey];
+    document.title = routeConfig.title;
+
+    if (routeConfig.seo?.description) {
+      let descriptionMeta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+      if (!descriptionMeta) {
+        descriptionMeta = document.createElement("meta");
+        descriptionMeta.setAttribute("name", "description");
+        document.head.appendChild(descriptionMeta);
+      }
+      descriptionMeta.setAttribute("content", routeConfig.seo.description);
+    }
+
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+
+    canonical.setAttribute("href", `${window.location.origin}/?page=${currentPageKey}`);
+  }, [currentPageKey]);
 
   const handleInternalRoute = React.useCallback(
     (route: string) => {
-      const targetRoute = resolveRouteFromString(route);
+      const targetRoute = resolvePageKeyFromString(route);
 
       switch (targetRoute) {
-        case "calculator":
+        case "calculadora_gordura":
           navigateToCalculator();
           return;
-        case "reset-nutricional":
+        case "reset_nutricional":
           navigateToReset();
           return;
         case "ebooks":
           navigateToEbooks();
           return;
-        case "link-bio":
+        case "link_bio":
           navigateToLinkBio();
           return;
-        case "controle-metabolico-barra":
+        case "controle_metabolico_barra":
           navigateToControleMetabolicoBarra();
           return;
-        case "consulta-online-controle-peso":
+        case "consulta_online_controle_peso":
           navigateToConsultaOnlineControlePeso();
           return;
         case "home":
@@ -626,6 +638,41 @@ const App: React.FC = () => {
       navigateToReset,
     ],
   );
+
+  const renderCurrentPage = React.useCallback(() => {
+    const context = {
+      renderHome: () => (
+        <LandingContent
+          onNavigateToCalculator={navigateToCalculator}
+          onNavigateToReset={navigateToReset}
+          calculatorHref={routeHrefs.calculator}
+          resetHref={routeHrefs.reset}
+          onWhatsappClick={handleWhatsappClick}
+          isWhatsappCta={isWhatsappCta}
+          getWhatsappHref={getWhatsappHref}
+        />
+      ),
+      renderCalculadoraGordura: () => <BodyFatCalculator />,
+      renderResetNutricional: () => <ResetNutricionalPage onNavigateHome={navigateHome} />,
+      renderLinkBio: () => <LinkBio onNavigateHome={navigateHome} onInternalRoute={handleInternalRoute} />,
+      renderEbooks: () => <EbooksPage onNavigateHome={navigateHome} />,
+      renderControleMetabolicoBarra: () => <AdsLandingPage routeKey="controle_metabolico_barra" />,
+      renderConsultaOnlineControlePeso: () => <AdsLandingPage routeKey="consulta_online_controle_peso" />,
+    };
+
+    return ROUTES[currentPageKey].render(context);
+  }, [
+    currentPageKey,
+    getWhatsappHref,
+    handleInternalRoute,
+    handleWhatsappClick,
+    isWhatsappCta,
+    navigateHome,
+    navigateToCalculator,
+    navigateToReset,
+    routeHrefs.calculator,
+    routeHrefs.reset,
+  ]);
 
   return (
     <main className="min-h-screen bg-surface-100 text-neutral-900">
@@ -647,28 +694,7 @@ const App: React.FC = () => {
           </div>
         </div>
       </header>
-      {activePage === "calculator" && <BodyFatCalculator />}
-      {activePage === "link-bio" && (
-        <LinkBio
-          onNavigateHome={navigateHome}
-          onInternalRoute={handleInternalRoute}
-        />
-      )}
-      {activePage === "ebooks" && <EbooksPage onNavigateHome={navigateHome} />}
-      {activePage === "home" && (
-        <LandingContent
-          onNavigateToCalculator={navigateToCalculator}
-          onNavigateToReset={navigateToReset}
-          calculatorHref={routeHrefs.calculator}
-          resetHref={routeHrefs.reset}
-          onWhatsappClick={handleWhatsappClick}
-          isWhatsappCta={isWhatsappCta}
-          getWhatsappHref={getWhatsappHref}
-        />
-      )}
-      {activePage === "reset-nutricional" && <ResetNutricionalPage onNavigateHome={navigateHome} />}
-      {activePage === "controle-metabolico-barra" && <AdsLandingPage routeKey="controle-metabolico-barra" />}
-      {activePage === "consulta-online-controle-peso" && <AdsLandingPage routeKey="consulta-online-controle-peso" />}
+      {renderCurrentPage()}
       <Footer />
     </main>
   );
