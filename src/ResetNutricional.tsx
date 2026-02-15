@@ -272,7 +272,7 @@ const ResetNutricionalPage: React.FC<{ onNavigateHome: () => void }> = ({ onNavi
                 />
                 <button
                   type="button"
-                  onClick={() => openWhatsappForCta("Tirar dúvidas rápidas", "reset-nutricional")}
+                  onClick={() => openWhatsappForCta("Tirar dúvidas rápidas", "reset_nutricional")}
                   className="rounded-full border border-neutral-900/10 px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:bg-peach-500/40"
                 >
                   Tirar dúvidas rápidas

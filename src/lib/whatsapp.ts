@@ -1,5 +1,5 @@
 import { DEFAULT_WHATSAPP_MESSAGE, buildWhatsappUrl } from "../config/whatsapp";
-import { RouteKey } from "./router";
+import { RouteKey } from "./routes";
 
 const normalizeLabel = (label: string): string =>
   label
@@ -9,10 +9,10 @@ const normalizeLabel = (label: string): string =>
     .replace(/\p{Diacritic}/gu, "");
 
 const ROUTE_SPECIFIC_MESSAGES: Partial<Record<RouteKey, Record<string, string>>> = {
-  "link-bio": {
+  link_bio: {
     "agendar consulta": "Olá nutri, vim pelo link da bio e gostaria de agendar uma consulta.",
   },
-  "reset-nutricional": {
+  reset_nutricional: {
     "agendar consulta": "Olá nutri, tenho interesse no Reset Nutricional e quero agendar uma consulta.",
     "tirar duvidas rapidas":
       "Olá nutri, gostaria de tirar dúvidas rápidas sobre o Reset Nutricional.",
