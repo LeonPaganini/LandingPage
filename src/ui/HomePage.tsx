@@ -12,6 +12,8 @@ import {
 import { LINK_BIO_HERO, LINK_BIO_PROFILE } from "../data/linkBioConfig";
 import { LandingVariant, getLandingCopy } from "../data/landingCopy";
 import { Badge, CTAButton, GlassCard, SectionTitle, SectionWave } from "./Primitives";
+import LocationModule from "./sections/LocationModule";
+import TransformationTestimonials from "./sections/TransformationTestimonials";
 
 type HomePageProps = {
   variant: LandingVariant;
@@ -35,6 +37,10 @@ const HomePage: React.FC<HomePageProps> = ({
   getWhatsappHref,
 }) => {
   const copy = getLandingCopy(variant);
+  const transformationTitle =
+    variant === "online"
+      ? "Transformação por Atendimento Online"
+      : "Transformação por Atendimento Presencial";
 
   return (
     <>
@@ -52,7 +58,12 @@ const HomePage: React.FC<HomePageProps> = ({
       />
       <StorySection onWhatsappClick={onWhatsappClick} />
       <BenefitsSection />
-      <TestimonialsSection />
+      {variant === "default" ? (
+        <TestimonialsSection />
+      ) : (
+        <TransformationTestimonials title={transformationTitle} variant={variant} />
+      )}
+      {variant === "presencial" ? <LocationModule /> : null}
       <FAQSection />
       <FinalCTASection copy={copy} onWhatsappClick={onWhatsappClick} />
     </>
