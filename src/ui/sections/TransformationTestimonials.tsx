@@ -12,11 +12,11 @@ const testimonialCards = [
     img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep1-900",
   },
   {
-    quote: "O protocolo do Dr. Anthony mudou meu corpo e minha disposição.",
+    quote: "O protocolo da Nutri mudou meu corpo e minha disposição.",
     img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep2-900",
   },
   {
-    quote: "Nunca fui tão bem atendido. É outro nível de medicina.",
+    quote: "Nunca fui tão bem atendido. É outro nível de nutricionista.",
     img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep3-900",
   },
 ];
