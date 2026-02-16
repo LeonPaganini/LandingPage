@@ -9,15 +9,15 @@ type TransformationTestimonialsProps = {
 const testimonialCards = [
   {
     quote: "Voltei a ter energia para treinar, trabalhar e viver.",
-    img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep1-900.webp",
+    img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep1-900",
   },
   {
     quote: "O protocolo do Dr. Anthony mudou meu corpo e minha disposição.",
-    img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep2-900.webp",
+    img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep2-900",
   },
   {
     quote: "Nunca fui tão bem atendido. É outro nível de medicina.",
-    img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep3-900.webp",
+    img: "https://institutofrancisconi.com.br/wp-content/uploads/2025/11/dep3-900",
   },
 ];
 
