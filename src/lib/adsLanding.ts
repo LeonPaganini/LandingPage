@@ -26,6 +26,7 @@ export type AdsLeadPayload = {
   utm_medium: string;
   utm_content: string;
   timestamp: string;
+  page?: AdsRouteSlug;
 };
 
 export type AdsPageDataPayload = {
@@ -93,7 +94,7 @@ export const validateAdsLeadValues = (values: AdsLeadFormValues): string | null 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Informe um e-mail válido.";
 
   const phone = sanitizePhone(values.whatsapp);
-  if (phone.length < 10 || phone.length > 13) return "Informe um WhatsApp válido com DDD.";
+  if (phone.length < 10 || phone.length > 11) return "Informe um WhatsApp válido com DDD.";
 
   const idade = Number(values.idade);
   if (!Number.isInteger(idade) || idade < 18 || idade > 70) return "A idade deve estar entre 18 e 70 anos.";

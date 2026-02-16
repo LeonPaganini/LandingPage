@@ -25,6 +25,10 @@ Este projeto usa **query routing** como padrão público/canonical, via `src/lib
 - Ads presencial: `https://thaispaganini.com.br/?page=controle-metabolico-barra`
 - Ads online: `https://thaispaganini.com.br/?page=consulta-online-controle-peso`
 
+### Rotas Ads
+- `/?page=controle-metabolico-barra`
+- `/?page=consulta-online-controle-peso`
+
 ## Compatibilidade legada
 O router continua aceitando formatos antigos para não quebrar links já publicados:
 - `?page=link_bio`
