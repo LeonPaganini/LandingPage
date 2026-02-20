@@ -64,19 +64,19 @@ export const ROUTES: Record<
     render: (context) => context.renderEbooks(),
   },
   controle_metabolico_barra: {
-    title: "Nutricionista na Barra da Tijuca para Controle de Peso | Atendimento Presencial",
+    title: "Nutricionista na Barra da Tijuca | Controle metabólico feminino",
     seo: {
       description:
-        "Atendimento clínico individual no Shopping Downtown para controle de peso feminino, compulsão alimentar e organização metabólica.",
+        "Atendimento clínico individual no Shopping Downtown para mulheres com dificuldade de emagrecimento e sintomas metabólicos persistentes.",
     },
     isPublic: true,
     render: (context) => context.renderControleMetabolicoBarra(),
   },
   consulta_online_controle_peso: {
-    title: "Consulta Nutricional Online para Controle de Peso | Retorno em 45 dias",
+    title: "Consulta nutricional online | Controle de peso e metabolismo",
     seo: {
       description:
-        "Consulta nutricional online individual para mulheres com dificuldade de emagrecimento, compulsão alimentar e baixa energia, com retorno em 45 dias.",
+        "Atendimento individual com retorno estruturado em 45 dias para ajuste de estratégia.",
     },
     isPublic: true,
     render: (context) => context.renderConsultaOnlineControlePeso(),
