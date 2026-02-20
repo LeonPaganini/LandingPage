@@ -90,97 +90,70 @@ const COPY = {
   },
   online: {
     hero: {
-      title: "Não consegue emagrecer mesmo fazendo 'tudo certo'?",
+      title: "Consulta Nutricional Online para Controle de Peso e Organização Metabólica",
       subtitle:
-        "Consulta Nutricional Online para mulheres que enfrentam compulsão alimentar, desorganização metabólica e dificuldade de perder peso — mesmo treinando ou tentando várias dietas.",
-      description:
-        "Acompanhamento individual com retorno estratégico em 45 dias para organizar sua alimentação e sua rotina de forma estruturada.",
-      cta: "Iniciar meu acompanhamento online",
+        "Atendimento individual para mulheres que desejam estruturar alimentação, reduzir compulsão e recuperar energia — sem sair de casa.",
+      description: "Consulta online com retorno estratégico em 45 dias para ajustes e evolução do plano.",
+      cta: "Agendar Consulta Online",
       microcopy: "Vagas online limitadas por semana.",
     },
-    expectations: {
-      title: "O que você pode esperar",
-      bullets: [
-        "Organização alimentar estruturada",
-        "Redução gradual da compulsão",
-        "Ajuste metabólico progressivo",
-        "Plano adaptado à sua rotina real",
-        "Retorno estratégico para ajustes",
-      ],
-      footer: "Não é dieta pronta. É estratégia individual.",
-    },
     audience: {
-      title: "Essa consulta online é indicada para você que:",
+      title: "Essa consulta online é para você que:",
       bullets: [
-        "Já tentou diferentes dietas e não conseguiu manter resultado",
-        "Sente que vive ciclos de compulsão e culpa",
-        "Não consegue manter constância alimentar",
-        "Sofre com inchaço, cansaço ou desorganização metabólica",
         "Quer acompanhamento profissional sem sair de casa",
+        "Já tentou dietas e não conseguiu manter resultado",
+        "Vive ciclos de compulsão alimentar",
+        "Busca organização alimentar adaptada à sua rotina",
+        "Quer acompanhamento com retorno estruturado",
       ],
-      footer: "Se você busca organização, controle e direcionamento técnico, essa consulta é para você.",
     },
     process: {
-      title: "Estrutura da consulta online",
+      title: "Como funciona a consulta online",
       steps: [
         {
-          title: "1️⃣ Pré-consulta estruturada",
-          description: "Você responde um questionário detalhado antes do atendimento.",
+          title: "1️⃣ Pré-consulta detalhada",
+          description: "Você preenche um formulário completo antes do atendimento.",
         },
         {
           title: "2️⃣ Consulta individual por videochamada",
-          description: "Avaliação completa da sua rotina, histórico e objetivos.",
+          description: "Avaliação da sua rotina, histórico e objetivos.",
         },
         {
           title: "3️⃣ Estratégia personalizada",
-          description: "Plano alimentar e comportamental adaptado à sua realidade.",
+          description: "Plano alimentar adaptado à sua realidade.",
         },
         {
           title: "4️⃣ Retorno online em 45 dias",
-          description: "Reavaliação estratégica com ajustes individualizados.",
+          description: "Reavaliação estratégica com ajustes personalizados.",
         },
       ],
-      cta: "Quero organizar meu controle de peso",
+      cta: "Quero agendar minha consulta online",
     },
     transformationTitle: "Transformação por Atendimento Online",
     transformationCta: "Agendar Consulta Online",
-    differential: {
-      title: "Por que esse acompanhamento é diferente?",
-      lines: [
-        "Não é plano genérico.",
-        "Não é cardápio pronto.",
-        "Não é desafio de 21 dias.",
-        "É acompanhamento estruturado, individual e ajustado conforme sua evolução.",
-      ],
-      footer: "A agenda online é organizada para garantir qualidade no atendimento e acompanhamento real.",
-    },
     authority: {
-      title: "Atendimento individual, onde você estiver",
+      title: "Acompanhamento estruturado onde você estiver",
       description:
-        "O formato online mantém a mesma estrutura estratégica do presencial. Você recebe consulta individual, plano personalizado, direcionamento técnico e retorno programado.",
+        "O atendimento online mantém a mesma estrutura estratégica do presencial, com organização, acompanhamento e retorno programado.",
     },
     faq: [
       {
         q: "A consulta online funciona mesmo?",
-        a: "Sim. O atendimento é individual e estruturado. O retorno programado permite ajustes estratégicos.",
+        a: "Sim. O atendimento é estruturado e individual.",
       },
       {
         q: "Recebo plano alimentar?",
-        a: "Sim. Você recebe plano personalizado e orientações específicas para sua rotina.",
+        a: "Sim. Você recebe plano personalizado e orientações estratégicas.",
       },
       {
         q: "Preciso de exames?",
-        a: "Não é obrigatório, mas pode contribuir para direcionar melhor a estratégia.",
-      },
-      {
-        q: "Em quanto tempo começo a ver resultado?",
-        a: "Os primeiros ajustes já são percebidos nas primeiras semanas, com evolução progressiva.",
+        a: "Não é obrigatório, mas pode contribuir para a estratégia.",
       },
     ],
     finalCta: {
       title: "Pronta para organizar seu controle de peso?",
-      button: "Iniciar meu acompanhamento online",
-      subtitle: "Estrutura. Estratégia. Acompanhamento individual.",
+      button: "Agendar minha consulta online",
+      subtitle: "Estratégia personalizada e acompanhamento estruturado.",
     },
   },
 } as const;
@@ -195,40 +168,12 @@ const formatPhone = (value: string) => {
 
 const AdsLandingExperience: React.FC<AdsLandingExperienceProps> = ({ variant }) => {
   const copy = COPY[variant];
-  const onlineCopy = variant === "online" ? COPY.online : null;
   const formRef = React.useRef<HTMLElement | null>(null);
   const [formData, setFormData] = React.useState<LeadFormData>({ nome: "", telefone: "" });
 
   const scrollToForm = React.useCallback(() => {
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
-
-  React.useEffect(() => {
-    if (variant !== "online") {
-      return;
-    }
-
-    document.title = "Nutricionista Online | Controle de Peso e Compulsão";
-
-    let descriptionMeta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-    if (!descriptionMeta) {
-      descriptionMeta = document.createElement("meta");
-      descriptionMeta.setAttribute("name", "description");
-      document.head.appendChild(descriptionMeta);
-    }
-    descriptionMeta.setAttribute(
-      "content",
-      "Consulta nutricional online com retorno em 45 dias. Atendimento individual para mulheres com dificuldade de emagrecer, compulsão e desorganização metabólica.",
-    );
-
-    let robotsMeta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
-    if (!robotsMeta) {
-      robotsMeta = document.createElement("meta");
-      robotsMeta.setAttribute("name", "robots");
-      document.head.appendChild(robotsMeta);
-    }
-    robotsMeta.setAttribute("content", "noindex, nofollow");
-  }, [variant]);
 
   const trackSubmitConversion = React.useCallback(() => {
     const eventName = variant === "presencial" ? "ads_submit_presencial" : "ads_submit_online";
@@ -279,25 +224,6 @@ const AdsLandingExperience: React.FC<AdsLandingExperienceProps> = ({ variant }) 
         </div>
       </section>
 
-      {onlineCopy ? (
-        <SectionWave className="bg-white">
-          <div className="mx-auto max-w-5xl px-6">
-            <SectionTitle label={onlineCopy.expectations.title} />
-            <GlassCard className="p-6 md:p-8">
-              <ul className="space-y-3">
-                {onlineCopy.expectations.bullets.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-neutral-800">
-                    <span className="mt-1 text-primary-700">✔</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-6 text-sm font-semibold text-neutral-700">{onlineCopy.expectations.footer}</p>
-            </GlassCard>
-          </div>
-        </SectionWave>
-      ) : null}
-
       <SectionWave className="bg-white">
         <div className="mx-auto max-w-5xl px-6">
           <SectionTitle label={copy.audience.title} />
@@ -344,22 +270,6 @@ const AdsLandingExperience: React.FC<AdsLandingExperienceProps> = ({ variant }) 
         </div>
       </SectionWave>
 
-      {onlineCopy ? (
-        <SectionWave className="bg-gradient-to-b from-surface-100 to-white">
-          <div className="mx-auto max-w-5xl px-6">
-            <SectionTitle label={onlineCopy.differential.title} />
-            <GlassCard className="p-6 md:p-8">
-              <div className="space-y-3 text-neutral-800">
-                {onlineCopy.differential.lines.map((line) => (
-                  <p key={line}>{line}</p>
-                ))}
-              </div>
-              <p className="mt-6 text-sm font-semibold text-neutral-700">{onlineCopy.differential.footer}</p>
-            </GlassCard>
-          </div>
-        </SectionWave>
-      ) : null}
-
       <SectionWave className="bg-gradient-to-b from-blush-300/20 to-white">
         <div className="mx-auto max-w-5xl px-6">
           <SectionTitle label={copy.authority.title} />
@@ -381,8 +291,8 @@ const AdsLandingExperience: React.FC<AdsLandingExperienceProps> = ({ variant }) 
 
       <SectionWave className="bg-gradient-to-b from-surface-100 to-white">
         <div className="mx-auto max-w-5xl px-6">
-          <SectionTitle label={variant === "online" ? "Perguntas frequentes" : "FAQ"} />
-          <div className={`grid gap-4 ${variant === "online" ? "md:grid-cols-2 lg:grid-cols-3" : "md:grid-cols-3"}`}>
+          <SectionTitle label="FAQ" />
+          <div className="grid gap-4 md:grid-cols-3">
             {copy.faq.map((item) => (
               <GlassCard key={item.q} className="p-5">
                 <p className="font-semibold text-neutral-900">{item.q}</p>
@@ -393,11 +303,7 @@ const AdsLandingExperience: React.FC<AdsLandingExperienceProps> = ({ variant }) 
         </div>
       </SectionWave>
 
-      <section
-        id="form"
-        ref={formRef}
-        className="bg-gradient-to-br from-primary-700/80 via-peach-500/60 to-blush-300/70 px-6 py-16 text-white"
-      >
+      <section ref={formRef} className="bg-gradient-to-br from-primary-700/80 via-peach-500/60 to-blush-300/70 px-6 py-16 text-white">
         <div className="mx-auto max-w-5xl">
           <GlassCard className="border-white/60 px-6 py-8 text-white md:px-10">
             <h2 className="text-3xl font-bold">{copy.finalCta.title}</h2>
