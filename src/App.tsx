@@ -208,6 +208,11 @@ const App: React.FC = () => {
       getWhatsappHref,
     };
 
+    const page = new URLSearchParams(window.location.search).get("page");
+    if (!page) {
+      return <HomeOriginal {...sharedHomeProps} />;
+    }
+
     const context = {
       renderHome: () => <HomeOriginal {...sharedHomeProps} />,
       renderCalculadoraGordura: () => <BodyFatCalculator />,
