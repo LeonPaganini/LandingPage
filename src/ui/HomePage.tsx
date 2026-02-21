@@ -17,6 +17,7 @@ import TransformationTestimonials from "./sections/TransformationTestimonials";
 
 type HomePageProps = {
   variant: LandingVariant;
+  routeKey?: "controle_metabolico_barra" | "consulta_online_controle_peso";
   onNavigateToCalculator: () => void;
   onNavigateToReset: () => void;
   calculatorHref: string;
@@ -28,6 +29,7 @@ type HomePageProps = {
 
 const HomePage: React.FC<HomePageProps> = ({
   variant,
+  routeKey,
   onNavigateToCalculator,
   onNavigateToReset,
   calculatorHref,
@@ -48,6 +50,7 @@ const HomePage: React.FC<HomePageProps> = ({
       <DiagnosticSection copy={copy} />
       <AboutSection copy={copy} onWhatsappClick={onWhatsappClick} />
       <MethodsSection
+        routeKey={routeKey}
         onNavigateToCalculator={onNavigateToCalculator}
         onNavigateToReset={onNavigateToReset}
         calculatorHref={calculatorHref}
@@ -210,6 +213,7 @@ const AboutSection: React.FC<{ copy: ReturnType<typeof getLandingCopy>; onWhatsa
 };
 
 const MethodsSection: React.FC<{
+  routeKey?: "controle_metabolico_barra" | "consulta_online_controle_peso";
   onNavigateToCalculator: () => void;
   onNavigateToReset: () => void;
   calculatorHref: string;
@@ -217,12 +221,23 @@ const MethodsSection: React.FC<{
   onWhatsappClick: (label: string) => void;
   isWhatsappCta: (label: string) => boolean;
   getWhatsappHref: (label: string) => string;
-}> = ({ onNavigateToCalculator, onNavigateToReset, calculatorHref, resetHref, onWhatsappClick, isWhatsappCta, getWhatsappHref }) => (
-  <SectionWave className="bg-gradient-to-b from-peach-500/40 via-surface-100 to-white">
-    <div className="mx-auto max-w-6xl px-6">
-      <SectionTitle label="Métodos & Programas" />
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {programs.map((program) => {
+}> = ({ routeKey, onNavigateToCalculator, onNavigateToReset, calculatorHref, resetHref, onWhatsappClick, isWhatsappCta, getWhatsappHref }) => {
+  const filteredPrograms =
+    routeKey === "controle_metabolico_barra"
+      ? programs.filter(
+          (program) =>
+            program.title !== "Reset Nutricional (Grupo de emagrecimento 21 dias) - Sazonal" &&
+            program.title !== "AppNutri — Nutrição Inteligente" &&
+            program.title !== "Calculadora de % de Gordura",
+        )
+      : programs;
+
+  return (
+    <SectionWave className="bg-gradient-to-b from-peach-500/40 via-surface-100 to-white">
+      <div className="mx-auto max-w-6xl px-6">
+        <SectionTitle label="Métodos & Programas" />
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {filteredPrograms.map((program) => {
           const goToCalculator = program.cta.toLowerCase().includes("calcular");
           const isReset = program.title.toLowerCase().includes("reset nutricional");
           const isWhatsapp = isWhatsappCta(program.cta);
@@ -257,11 +272,12 @@ const MethodsSection: React.FC<{
               </div>
             </GlassCard>
           );
-        })}
+          })}
+        </div>
       </div>
-    </div>
-  </SectionWave>
-);
+    </SectionWave>
+  );
+};
 
 const StorySection: React.FC<{ onWhatsappClick: (label: string) => void }> = ({ onWhatsappClick }) => (
   <SectionWave className="bg-blush-300/20">

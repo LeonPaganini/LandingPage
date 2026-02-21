@@ -18,7 +18,7 @@ type AdsLandingPageProps = {
 const AdsLandingPage: React.FC<AdsLandingPageProps> = ({ routeKey, ...props }) => {
   const variant = routeKey === "controle_metabolico_barra" ? "presencial" : "online";
 
-  return <HomePage variant={variant} {...props} />;
+  return <HomePage variant={variant} routeKey={routeKey} {...props} />;
 };
 
 export default AdsLandingPage;
