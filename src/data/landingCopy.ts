@@ -136,4 +136,5 @@ export const landingCopy: Record<LandingVariant, LandingCopy> = {
   },
 };
 
-export const getLandingCopy = (variant: LandingVariant): LandingCopy => landingCopy[variant];
+export const getLandingCopy = (variant: LandingVariant): LandingCopy =>
+  landingCopy[variant] ?? landingCopy.default;

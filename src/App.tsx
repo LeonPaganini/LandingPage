@@ -4,7 +4,7 @@ import ResetNutricionalPage from "./ResetNutricional.js";
 import LinkBio from "./LinkBio.js";
 import EbooksPage from "./Ebooks.js";
 import AdsLandingPage from "./AdsLandingPage";
-import HomePage from "./ui/HomePage";
+import HomeOriginal from "./ui/HomeOriginal";
 import { CTAButton } from "./ui/Primitives.js";
 import { getCurrentPageKey, getHref, navigateTo, resolvePageKeyFromString } from "./lib/queryRouter.js";
 import { ROUTES, RouteKey } from "./lib/routes.js";
@@ -29,6 +29,23 @@ const Footer: React.FC = () => (
     </div>
   </footer>
 );
+
+
+
+const ADS_ROUTE_KEYS: RouteKey[] = ["controle_metabolico_barra", "consulta_online_controle_peso"];
+
+const getCanonicalHrefForRoute = (routeKey: RouteKey): string => {
+  if (routeKey === "home") return `${window.location.origin}/`;
+
+  const canonicalPage =
+    routeKey === "controle_metabolico_barra"
+      ? "controle-metabolico-barra"
+      : routeKey === "consulta_online_controle_peso"
+        ? "consulta-online-controle-peso"
+        : routeKey;
+
+  return `${window.location.origin}/?page=${canonicalPage}`;
+};
 
 const App: React.FC = () => {
   const [currentPageKey, setCurrentPageKey] = React.useState<RouteKey>(() => getCurrentPageKey());
@@ -120,14 +137,24 @@ const App: React.FC = () => {
       canonical.setAttribute("rel", "canonical");
       document.head.appendChild(canonical);
     }
+    canonical.setAttribute("href", getCanonicalHrefForRoute(currentPageKey));
 
-    const canonicalPage =
-      currentPageKey === "controle_metabolico_barra"
-        ? "controle-metabolico-barra"
-        : currentPageKey === "consulta_online_controle_peso"
-          ? "consulta-online-controle-peso"
-          : currentPageKey;
-    canonical.setAttribute("href", `${window.location.origin}/?page=${canonicalPage}`);
+    const isAdsPage = ADS_ROUTE_KEYS.includes(currentPageKey);
+    let robotsMeta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+
+    if (isAdsPage) {
+      if (!robotsMeta) {
+        robotsMeta = document.createElement("meta");
+        robotsMeta.setAttribute("name", "robots");
+        document.head.appendChild(robotsMeta);
+      }
+      robotsMeta.setAttribute("content", "noindex, nofollow");
+      return;
+    }
+
+    if (robotsMeta) {
+      robotsMeta.remove();
+    }
   }, [currentPageKey]);
 
   const handleInternalRoute = React.useCallback(
@@ -182,7 +209,7 @@ const App: React.FC = () => {
     };
 
     const context = {
-      renderHome: () => <HomePage variant="default" {...sharedHomeProps} />,
+      renderHome: () => <HomeOriginal {...sharedHomeProps} />,
       renderCalculadoraGordura: () => <BodyFatCalculator />,
       renderResetNutricional: () => <ResetNutricionalPage onNavigateHome={navigateHome} />,
       renderLinkBio: () => <LinkBio onNavigateHome={navigateHome} onInternalRoute={handleInternalRoute} />,
