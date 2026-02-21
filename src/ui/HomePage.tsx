@@ -75,6 +75,7 @@ const HeroSection: React.FC<{ copy: ReturnType<typeof getLandingCopy>; onWhatsap
     <div className="home-hero__bg absolute inset-0 -z-10 overflow-hidden">
       <img src={hero.image} alt="" className="home-hero__bg-img" loading="lazy" aria-hidden />
       <div className="home-hero__bg-overlay" />
+      <div className="home-hero__bottom-fade" aria-hidden="true" />
     </div>
     <div className="home-hero__grid relative mx-auto max-w-8xl">
       <div className="home-hero__mobile-portrait">
