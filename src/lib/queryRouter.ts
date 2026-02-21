@@ -77,6 +77,12 @@ export const getHref = (pageKey: RouteKey, currentLocation: Location = window.lo
 
   const nextUrl = new URL(currentLocation.href);
   nextUrl.pathname = "/";
+
+  if (pageKey === "home") {
+    nextUrl.searchParams.delete(PAGE_PARAM);
+    return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
+  }
+
   const queryPageValue =
     pageKey === "controle_metabolico_barra"
       ? "controle-metabolico-barra"
