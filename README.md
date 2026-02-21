@@ -44,16 +44,27 @@ Quando alguém acessa por path, a aplicação resolve a rota e **normaliza autom
 4. Definir o slug canonical em `canonicalPageByRoute`.
 5. Renderizar a página em `src/App.tsx` com `activePage === "<routeKey>"`.
 
-## Render Static Site (SPA rewrite)
-Para evitar 404 em acesso direto/refresh, configure no Render:
+## Render Static Site (sem rewrite global)
+Para este projeto (query routing via `/?page=`), **não configure** rewrite global `/* -> /index.html`.
+
+Configuração recomendada no Render Static Site:
 - **Build Command:** `npm install && npm run build`
 - **Publish Directory:** `dist`
-- **Redirects/Rewrites:**
-  - Source: `/*`
-  - Destination: `/index.html`
-  - Type: `Rewrite`
+- **Redirects/Rewrites:** nenhum rewrite global para `/index.html`
 
-Referência: documentação de Redirects/Rewrites do Render.
+Motivo: rewrite global pode capturar `/assets/*` no domínio customizado e devolver HTML no lugar de CSS/JS.
+
+## Diagnóstico de domínio customizado (assets)
+1. Gere build local:
+   - `npm run build`
+2. Rode o diagnóstico:
+   - `npm run diagnose:domain`
+
+O script `scripts/diagnose-domain.mjs`:
+- lê o asset CSS real de `dist/index.html`;
+- testa `onrender.com`, `www.thaispaganini.com.br` e `thaispaganini.com.br`;
+- imprime status, `location`, `content-type` e preview de body quando não vier CSS;
+- retorna erro (`exit 1`) se houver redirect (301/302/307/308) ou `content-type` diferente de `text/css`.
 
 
 ## Conteúdo dinâmico das páginas de Ads via Google Sheets
