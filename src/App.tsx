@@ -128,18 +128,6 @@ const App: React.FC = () => {
           ? "consulta-online-controle-peso"
           : currentPageKey;
     canonical.setAttribute("href", `${window.location.origin}/?page=${canonicalPage}`);
-
-
-    let robotsMeta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
-    if (!robotsMeta) {
-      robotsMeta = document.createElement("meta");
-      robotsMeta.setAttribute("name", "robots");
-      document.head.appendChild(robotsMeta);
-    }
-
-    const shouldNoIndex =
-      currentPageKey === "controle_metabolico_barra" || currentPageKey === "consulta_online_controle_peso";
-    robotsMeta.setAttribute("content", shouldNoIndex ? "noindex, nofollow" : "index, follow");
   }, [currentPageKey]);
 
   const handleInternalRoute = React.useCallback(
@@ -199,8 +187,10 @@ const App: React.FC = () => {
       renderResetNutricional: () => <ResetNutricionalPage onNavigateHome={navigateHome} />,
       renderLinkBio: () => <LinkBio onNavigateHome={navigateHome} onInternalRoute={handleInternalRoute} />,
       renderEbooks: () => <EbooksPage onNavigateHome={navigateHome} />,
-      renderControleMetabolicoBarra: () => <AdsLandingPage routeKey="controle_metabolico_barra" />,
-      renderConsultaOnlineControlePeso: () => <AdsLandingPage routeKey="consulta_online_controle_peso" />,
+      renderControleMetabolicoBarra: () => <AdsLandingPage routeKey="controle_metabolico_barra" {...sharedHomeProps} />,
+      renderConsultaOnlineControlePeso: () => (
+        <AdsLandingPage routeKey="consulta_online_controle_peso" {...sharedHomeProps} />
+      ),
     };
 
     return ROUTES[currentPageKey].render(context);
