@@ -21,7 +21,7 @@ const pageCache = new Map();
 const STATIC_DIR = process.env.STATIC_DIR ?? "dist";
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
-  ".js": "application/javascript; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
@@ -360,22 +360,20 @@ const serveFile = (res, absolutePath) => {
 
   const ext = extname(absolutePath).toLowerCase();
   const contentType = MIME_TYPES[ext] ?? "application/octet-stream";
-
   res.statusCode = 200;
   res.setHeader("Content-Type", contentType);
-
-  const isDistAsset =
-    absolutePath.includes(`${STATIC_DIR}${join("/", "assets")}`) || absolutePath.includes(`${STATIC_DIR}\\assets`);
-  if (isDistAsset) {
-    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-  } else if (ext === ".html") {
-    res.setHeader("Cache-Control", "no-cache");
-  } else {
-    res.setHeader("Cache-Control", "public, max-age=3600");
-  }
-
   createReadStream(absolutePath).pipe(res);
   return true;
+};
+
+const getIndexFallback = () => {
+  const distIndex = join(process.cwd(), STATIC_DIR, "index.html");
+  if (existsSync(distIndex)) return distIndex;
+
+  const rootIndex = join(process.cwd(), "index.html");
+  if (existsSync(rootIndex)) return rootIndex;
+
+  return null;
 };
 
 const server = http.createServer(async (req, res) => {
@@ -484,26 +482,13 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === "GET") {
-    const pathname = url.pathname;
-
-    const isAssetRequest =
-      pathname.startsWith("/assets/") ||
-      /\.(css|js|map|png|jpg|jpeg|svg|ico|json|txt|woff|woff2|ttf|eot)$/i.test(pathname);
-
-    const candidate = pathname === "/" ? "index.html" : pathname.slice(1);
-    const staticPath = join(process.cwd(), STATIC_DIR, candidate);
+    const staticCandidate = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
+    const staticPath = join(process.cwd(), STATIC_DIR, staticCandidate);
 
     if (serveFile(res, staticPath)) return;
 
-    if (isAssetRequest) {
-      res.statusCode = 404;
-      res.setHeader("Content-Type", "text/plain; charset=utf-8");
-      res.end("Asset not found");
-      return;
-    }
-
-    const fallbackIndex = join(process.cwd(), STATIC_DIR, "index.html");
-    if (existsSync(fallbackIndex)) {
+    const fallbackIndex = getIndexFallback();
+    if (fallbackIndex) {
       serveFile(res, fallbackIndex);
       return;
     }
