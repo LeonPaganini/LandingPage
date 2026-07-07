@@ -61,11 +61,9 @@ const HomePage: React.FC<HomePageProps> = ({
       />
       <StorySection onWhatsappClick={onWhatsappClick} />
       <BenefitsSection />
-      {variant === "default" ? (
-        <TestimonialsSection />
-      ) : (
+      {variant !== "default" ? (
         <TransformationTestimonials title={transformationTitle} variant={variant} />
-      )}
+      ) : null}
       {variant === "presencial" ? <LocationModule /> : null}
       <FAQSection />
       <FinalCTASection copy={copy} onWhatsappClick={onWhatsappClick} />

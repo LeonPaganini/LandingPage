@@ -1,4 +1,4 @@
-import { ROUTES, RouteKey, defaultPage } from "./routes";
+import { ROUTES, RouteKey, defaultPage } from "./routes.js";
 
 const PAGE_PARAM = "page";
 
